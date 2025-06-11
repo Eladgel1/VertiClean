@@ -31,9 +31,9 @@ jobs:
         run: mkdir -p TestResults
 
       - name: Run Unity Tests (PlayMode)
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@v3
         with:
-          unityVersion: 6000.0.41f1
+          unityVersion: 2023.1.18f1
           testMode: playmode
           projectPath: .
           artifactsPath: TestResults
