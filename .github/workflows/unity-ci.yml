@@ -17,14 +17,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Unity License
+      - name: Cache Unity
         uses: actions/cache@v4
         with:
           path: |
+            ~/.cache/unity3d
             ~/.local/share/unity3d
-          key: ${{ runner.os }}-unity-license-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
+          key: ${{ runner.os }}-unity-cache
           restore-keys: |
-            ${{ runner.os }}-unity-license-
+            ${{ runner.os }}-unity-cache
 
       - name: Create TestResults directory
         run: mkdir -p TestResults
@@ -37,8 +38,7 @@ jobs:
           projectPath: .
           artifactsPath: TestResults
         env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
