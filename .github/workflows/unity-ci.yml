@@ -10,42 +10,35 @@ on:
 
 jobs:
   test:
-    name: Run Unity PlayMode Tests (No Docker)
+    name: Run Unity PlayMode Tests (Docker)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Unity License
+      - name: Cache Unity
         uses: actions/cache@v4
         with:
-          path: ~/.local/share/unity3d
-          key: ${{ runner.os }}-unity-license-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
+          path: |
+            ~/.cache/unity3d
+            ~/.local/share/unity3d
+          key: ${{ runner.os }}-unity-cache
           restore-keys: |
-            ${{ runner.os }}-unity-license-
-
-      - name: Install Unity Editor
-        uses: unity-actions/setup@v2
-        with:
-          unityVersion: 2023.1.18f1
+            ${{ runner.os }}-unity-cache
 
       - name: Create TestResults directory
         run: mkdir -p TestResults
 
-      - name: Run Unity PlayMode Tests
-        run: |
-          unity-editor \
-            -batchmode \
-            -nographics \
-            -projectPath . \
-            -runTests \
-            -testPlatform PlayMode \
-            -testResults TestResults/PlayModeResults.xml \
-            -logFile -
+      - name: Run Unity Tests (PlayMode)
+        uses: game-ci/unity-test-runner@v3
+        with:
+          unityVersion: 2023.1.18f1
+          testMode: playmode
+          projectPath: .
+          artifactsPath: TestResults
         env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
@@ -53,3 +46,4 @@ jobs:
         with:
           name: PlayModeResults
           path: TestResults/PlayModeResults.xml
+          
