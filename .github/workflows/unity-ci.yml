@@ -27,11 +27,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-unity-cache
 
-      - name: Set up Unity
-        uses: actions/setup-unity@v3
-        with:
-          unityVersion: 6000.0.41f1
-
       - name: Create TestResults directory
         run: mkdir -p TestResults
 
