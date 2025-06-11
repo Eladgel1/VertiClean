@@ -10,33 +10,33 @@ on:
 
 jobs:
   test:
-    name: Run Unity PlayMode Tests
+    name: Run Unity PlayMode Tests on Windows
     runs-on: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Unity packages
+      - name: Cache Unity
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/unity3d
-            ~/.local/share/unity3d
-          key: ${{ runner.os }}-unity-cache
+            C:\Users\runneradmin\AppData\Local\Unity
+          key: unity-cache-${{ runner.os }}
           restore-keys: |
-            ${{ runner.os }}-unity-cache
-
-      - name: Create TestResults directory
-        run: mkdir -p TestResults
+            unity-cache-
 
       - name: Run Unity Tests (PlayMode)
-        uses: game-ci/unity-test-runner@v3
-        with:
-          unityVersion: 6000.0.41f1
-          testMode: playmode
-          projectPath: .
-          artifactsPath: TestResults
+        run: |
+          "C:\Program Files\Unity\Hub\Editor\6000.0.41f1\Editor\Unity.exe" ^
+          -runTests ^
+          -projectPath . ^
+          -testPlatform PlayMode ^
+          -testResults TestResults/PlayModeResults.xml ^
+          -logFile unity-test-log.txt ^
+          -batchmode ^
+          -nographics ^
+          -quit
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
@@ -44,5 +44,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: TestResults
-          path: TestResults
+          name: PlayModeResults
+          path: TestResults/PlayModeResults.xml
