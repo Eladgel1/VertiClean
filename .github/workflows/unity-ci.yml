@@ -10,9 +10,11 @@ on:
 
 jobs:
   test:
+    name: Run Unity PlayMode Tests (No Docker)
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Cache Unity License
@@ -23,10 +25,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-unity-license-
 
+      - name: Install Unity Editor
+        uses: unity-actions/setup@v2
+        with:
+          unityVersion: 2023.1.18f1
+
       - name: Create TestResults directory
         run: mkdir -p TestResults
 
-      - name: Run Unity PlayMode Tests (no Docker)
+      - name: Run Unity PlayMode Tests
         run: |
           unity-editor \
             -batchmode \
