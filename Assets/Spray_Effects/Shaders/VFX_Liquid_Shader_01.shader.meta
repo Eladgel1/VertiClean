@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 355932e4430f1b44d964a47a8e0c806b
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _Texture_Reflect: {fileID: 2800000, guid: c703cd705b8b9194f8814dc992b62d4a, type: 3}
+  - _Texture_Normal: {fileID: 2800000, guid: 5d63ac5e2b3ccf945acf6765ef28536b, type: 3}
+  - _Texture: {fileID: 2800000, guid: 87a49223327c8a74490bc017995eadc4, type: 3}
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 274583
+  packageName: Spray Effects
+  packageVersion: 2.0
+  assetPath: Assets/Spray_Effects/Shaders/VFX_Liquid_Shader_01.shader
+  uploadId: 661323
