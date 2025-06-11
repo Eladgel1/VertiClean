@@ -17,15 +17,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Unity
+      - name: Cache Unity License
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/unity3d
             ~/.local/share/unity3d
-          key: ${{ runner.os }}-unity-cache
+          key: ${{ runner.os }}-unity-license-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
           restore-keys: |
-            ${{ runner.os }}-unity-cache
+            ${{ runner.os }}-unity-license-
 
       - name: Create TestResults directory
         run: mkdir -p TestResults
