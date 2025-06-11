@@ -28,15 +28,7 @@ jobs:
 
       - name: Run Unity Tests (PlayMode)
         run: |
-          "C:\Program Files\Unity\Hub\Editor\6000.0.41f1\Editor\Unity.exe" ^
-          -runTests ^
-          -projectPath . ^
-          -testPlatform PlayMode ^
-          -testResults TestResults/PlayModeResults.xml ^
-          -logFile unity-test-log.txt ^
-          -batchmode ^
-          -nographics ^
-          -quit
+          & "C:\Program Files\Unity\Hub\Editor\6000.0.41f1\Editor\Unity.exe" -runTests -projectPath . -testPlatform PlayMode -testResults TestResults\PlayModeResults.xml -logFile unity-test-log.txt -batchmode -nographics -quit
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
