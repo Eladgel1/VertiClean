@@ -1,0 +1,122 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\eladg\\VertiClean\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|c:\\users\\eladg\\verticlean\\assets\\scripts\\menu \u0026 game scripts\\menumanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\menu \u0026 game scripts\\menumanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|c:\\users\\eladg\\verticlean\\assets\\scripts\\xr scripts\\vrinputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\xr scripts\\vrinputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|c:\\users\\eladg\\verticlean\\assets\\scripts\\cleaning tool scripts\\spraytool.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cleaning tool scripts\\spraytool.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|c:\\users\\eladg\\verticlean\\assets\\scripts\\cleaning tool scripts\\moptool.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cleaning tool scripts\\moptool.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|c:\\users\\eladg\\verticlean\\assets\\tests\\unit tests\\unittests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|solutionrelative:assets\\tests\\unit tests\\unittests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|C:\\Users\\eladg\\VertiClean\\assets\\tests\\integration tests\\integrationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFCFDE68-2257-2924-6420-C5D66E41C8C4}|Assembly-CSharp.csproj|solutionrelative:assets\\tests\\integration tests\\integrationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "VRInputManager.cs",
+              "DocumentMoniker": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\XR Scripts\\VRInputManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\XR Scripts\\VRInputManager.cs",
+              "ToolTip": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\XR Scripts\\VRInputManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\XR Scripts\\VRInputManager.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T15:37:19.26Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MenuManager.cs",
+              "DocumentMoniker": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\Menu \u0026 Game Scripts\\MenuManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Menu \u0026 Game Scripts\\MenuManager.cs",
+              "ToolTip": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\Menu \u0026 Game Scripts\\MenuManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Menu \u0026 Game Scripts\\MenuManager.cs",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAiwH0AAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T15:37:01.996Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SprayTool.cs",
+              "DocumentMoniker": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\Cleaning Tool Scripts\\SprayTool.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Cleaning Tool Scripts\\SprayTool.cs",
+              "ToolTip": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\Cleaning Tool Scripts\\SprayTool.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Cleaning Tool Scripts\\SprayTool.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T15:34:27.852Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MopTool.cs",
+              "DocumentMoniker": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\Cleaning Tool Scripts\\MopTool.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Cleaning Tool Scripts\\MopTool.cs",
+              "ToolTip": "C:\\Users\\eladg\\VertiClean\\Assets\\Scripts\\Cleaning Tool Scripts\\MopTool.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Cleaning Tool Scripts\\MopTool.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T15:34:24.003Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IntegrationTests.cs",
+              "DocumentMoniker": "C:\\Users\\eladg\\VertiClean\\Assets\\Tests\\Integration Tests\\IntegrationTests.cs",
+              "RelativeDocumentMoniker": "Assets\\Tests\\Integration Tests\\IntegrationTests.cs",
+              "ToolTip": "C:\\Users\\eladg\\VertiClean\\Assets\\Tests\\Integration Tests\\IntegrationTests.cs",
+              "RelativeToolTip": "Assets\\Tests\\Integration Tests\\IntegrationTests.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwKEAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-08T17:40:50.425Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UnitTests.cs",
+              "DocumentMoniker": "C:\\Users\\eladg\\VertiClean\\Assets\\Tests\\Unit Tests\\UnitTests.cs",
+              "RelativeDocumentMoniker": "Assets\\Tests\\Unit Tests\\UnitTests.cs",
+              "ToolTip": "C:\\Users\\eladg\\VertiClean\\Assets\\Tests\\Unit Tests\\UnitTests.cs",
+              "RelativeToolTip": "Assets\\Tests\\Unit Tests\\UnitTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-08T17:40:28.838Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

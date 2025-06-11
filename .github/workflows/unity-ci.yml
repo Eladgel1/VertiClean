@@ -1,0 +1,53 @@
+name: Unity Sprint Pipeline
+
+on:
+  push:
+    branches:
+      - 'sprint-*'
+  pull_request:
+    branches:
+      - 'sprint-*'
+
+jobs:
+  test:
+    name: Run Unity PlayMode Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Unity packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/unity3d
+            ~/.local/share/unity3d
+          key: ${{ runner.os }}-unity-cache
+          restore-keys: |
+            ${{ runner.os }}-unity-cache
+
+      - name: Setup Unity
+        uses: game-ci/unity-installer@v3
+        with:
+          unityVersion: 6000.0.41f1
+
+      - name: Create TestResults directory
+        run: mkdir -p TestResults
+
+      - name: Run Unity Tests (PlayMode)
+        uses: game-ci/unity-test-runner@v3
+        with:
+          unityVersion: 6000.0.41f1
+          testMode: playmode
+          projectPath: .
+          artifactsPath: TestResults
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: TestResults
+          path: TestResults

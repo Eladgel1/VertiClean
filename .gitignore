@@ -1,0 +1,28 @@
+# Unity Generated Folders
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+MemoryCaptures/
+
+# IDE Files
+.vscode/
+.idea/
+
+# Build + Meta Files
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.pidb
+*.booproj
+
+# Keep only these:
+!Assets/
+!Packages/
+!ProjectSettings/
+!.github/
+!.github/workflows/

@@ -1,0 +1,202 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using System.Collections;
+
+public class MenuManager : MonoBehaviour {
+    public static MenuManager Instance { get; private set; }
+
+    [Header("Panels")]
+    public GameObject mainMenuPanel;
+    public GameObject startSubMenuPanel;
+    public GameObject optionsMenuPanel;
+    public GameObject quitConfirmationPanel;
+    public GameObject pauseMenuPanel;
+
+    [Header("State")]
+    public bool isInGame = false;
+    private GameObject currentPanel;
+    private int selectedIndex = 0;
+    private bool inputLocked = false;
+    private bool allowQuitInput = false;
+
+    [Header("UI Navigation")]
+    public Button[] mainButtons;
+    public Button[] startSubButtons;
+    public Button[] pauseButtons;
+
+    [Header("Quit Buttons")]
+    public Button quitYesButton;
+    public Button quitNoButton;
+
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
+        string scene = SceneManager.GetActiveScene().name;
+        isInGame = (scene == "GameScene");
+
+        if (!isInGame) OpenMainMenu();
+        else if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+    }
+
+    private void Start() {
+        if (quitYesButton != null)
+            quitYesButton.onClick.AddListener(() => SceneController.QuitGame());
+
+        if (quitNoButton != null)
+            quitNoButton.onClick.AddListener(() => CloseQuitConfirmation());
+    }
+
+    private void Update() {
+        if (inputLocked) return;
+
+        Button[] currentButtons = GetCurrentButtons();
+        if (currentButtons.Length > 0) {
+            Vector2 nav = VRInputManager.Instance.GetUINavigationDelta();
+
+            if (currentPanel == quitConfirmationPanel) {
+                if (nav.x > 0.5f) ChangeSelection(1);
+                else if (nav.x < -0.5f) ChangeSelection(-1);
+            }
+            else {
+                if (nav.y > 0.5f) ChangeSelection(-1);
+                else if (nav.y < -0.5f) ChangeSelection(1);
+            }
+
+            if (VRInputManager.Instance.GetUIClick()) {
+                if (currentPanel == quitConfirmationPanel && !allowQuitInput) return;
+                ActivateCurrentSelection();
+            }
+        }
+
+        if (VRInputManager.Instance.GetUIBack() || VRInputManager.Instance.GetOpenMenu()) {
+            if (isInGame) TogglePauseMenu();
+            else if (currentPanel == startSubMenuPanel || currentPanel == optionsMenuPanel)
+                OpenMainMenu();
+            else if (currentPanel == quitConfirmationPanel)
+                CloseQuitConfirmation();
+        }
+
+        if (quitConfirmationPanel != null && quitConfirmationPanel.activeSelf && allowQuitInput) {
+            if (Keyboard.current.yKey.wasPressedThisFrame) SceneController.QuitGame();
+            if (Keyboard.current.nKey.wasPressedThisFrame) CloseQuitConfirmation();
+        }
+    }
+
+    private void ChangeSelection(int dir) {
+        Button[] current = GetCurrentButtons();
+        if (current.Length == 0) return;
+
+        selectedIndex = Mathf.Clamp(selectedIndex + dir, 0, current.Length - 1);
+        current[selectedIndex].Select();
+    }
+
+    private void ActivateCurrentSelection() {
+        Button[] current = GetCurrentButtons();
+        if (current.Length == 0) return;
+
+        if (selectedIndex < 0 || selectedIndex >= current.Length) return;
+
+        Button selectedButton = current[selectedIndex];
+        if (selectedButton == null) return;
+
+        selectedButton.onClick.Invoke();
+    }
+
+    private Button[] GetCurrentButtons() {
+        if (mainMenuPanel != null && mainMenuPanel.activeSelf) return mainButtons ?? new Button[0];
+        if (startSubMenuPanel != null && startSubMenuPanel.activeSelf) return startSubButtons ?? new Button[0];
+        if (pauseMenuPanel != null && pauseMenuPanel.activeSelf) return pauseButtons ?? new Button[0];
+        if (quitConfirmationPanel != null && quitConfirmationPanel.activeSelf)
+            return new Button[] { quitYesButton, quitNoButton };
+        return new Button[0];
+    }
+
+    public void OpenMainMenu() {
+        isInGame = false;
+        StartCoroutine(ActivatePanelWithDelay(mainMenuPanel, mainButtons));
+    }
+
+    public void OpenStartSubMenu() {
+        StartCoroutine(ActivatePanelWithDelay(startSubMenuPanel, startSubButtons));
+    }
+
+    public void OpenOptionsMenu() {
+        currentPanel = optionsMenuPanel;
+        ShowOnlyPanel(optionsMenuPanel);
+        selectedIndex = 0;
+    }
+
+    public void OpenQuitConfirmation() {
+        ShowOnlyPanel(quitConfirmationPanel);
+        selectedIndex = 0;
+        allowQuitInput = false;
+        Invoke(nameof(EnableQuitInput), 0.3f);
+    }
+
+    private void EnableQuitInput() {
+        allowQuitInput = true;
+    }
+
+    public void CloseQuitConfirmation() {
+        if (isInGame) TogglePauseMenu();
+        else OpenMainMenu();
+    }
+
+    public void TogglePauseMenu() {
+        if (pauseMenuPanel == null) return;
+
+        bool showPause = !pauseMenuPanel.activeSelf;
+
+        if (optionsMenuPanel != null) optionsMenuPanel.SetActive(false);
+        if (quitConfirmationPanel != null) quitConfirmationPanel.SetActive(false);
+
+        pauseMenuPanel.SetActive(showPause);
+        currentPanel = showPause ? pauseMenuPanel : null;
+        Time.timeScale = showPause ? 0f : 1f;
+
+        if (showPause && pauseButtons != null && pauseButtons.Length > 0) {
+            selectedIndex = 0;
+            pauseButtons[selectedIndex].Select();
+        }
+    }
+
+    public void LoadGameSceneFromButton() {
+        isInGame = true;
+        SceneController.LoadGameScene();
+    }
+
+    public void LoadMainMenuFromButton() {
+        SceneController.LoadMainMenu();
+    }
+
+    public void ShowOnlyPanel(GameObject activePanel) {
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (startSubMenuPanel != null) startSubMenuPanel.SetActive(false);
+        if (optionsMenuPanel != null) optionsMenuPanel.SetActive(false);
+        if (quitConfirmationPanel != null) quitConfirmationPanel.SetActive(false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+
+        if (activePanel != null) activePanel.SetActive(true);
+        currentPanel = activePanel;
+    }
+
+    private IEnumerator ActivatePanelWithDelay(GameObject panel, Button[] buttons) {
+        inputLocked = true;
+        currentPanel = panel;
+        ShowOnlyPanel(panel);
+        yield return null;
+        selectedIndex = 0;
+        if (buttons != null && buttons.Length > 0) {
+            buttons[selectedIndex].Select();
+        }
+        inputLocked = false;
+    }
+}
