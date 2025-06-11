@@ -33,7 +33,6 @@ jobs:
       - name: Run Unity Tests (PlayMode)
         uses: game-ci/unity-test-runner@v3
         with:
-          unityVersion: 2022.3.18f1
           testMode: playmode
           projectPath: .
           artifactsPath: TestResults
