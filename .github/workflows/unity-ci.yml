@@ -15,11 +15,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Write Unity license file from secret
+        run: |
+          echo "${{ secrets.UNITY_LICENSE }}" > unity.ulf
+
       - name: Run Unity PlayMode tests in Docker
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
+            -v ${{ github.workspace }}/unity.ulf:/root/.local/share/unity3d/Unity/Unity_lic.ulf \
             unityci/editor:ubuntu-2023.1.18f1-linux-il2cpp-3.1.0 \
             unity-editor \
               -batchmode \
