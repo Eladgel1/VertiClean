@@ -19,6 +19,11 @@ jobs:
         run: |
           printf '%s' "${{ secrets.UNITY_LICENSE }}" > Unity_lic.ulf
 
+      - name: Check license file content
+        run: |
+          echo "LICENSE HEAD:"
+          head -n 3 Unity_lic.ulf
+
       - name: Run Unity PlayMode tests in Docker
         run: |
           docker run --rm \
