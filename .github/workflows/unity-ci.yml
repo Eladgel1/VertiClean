@@ -1,49 +1,25 @@
-name: Unity Sprint Pipeline
+name: Unity PlayMode Tests
 
 on:
   push:
     branches:
-      - 'sprint-*'
+      - main
+      - sprint-*
   pull_request:
-    branches:
-      - 'sprint-*'
 
 jobs:
   test:
-    name: Run Unity PlayMode Tests (Docker)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache Unity
-        uses: actions/cache@v4
+      - name: Run Unity PlayMode tests
+        uses: unity-ci/editor@3
         with:
-          path: |
-            ~/.cache/unity3d
-            ~/.local/share/unity3d
-          key: ${{ runner.os }}-unity-cache
-          restore-keys: |
-            ${{ runner.os }}-unity-cache
-
-      - name: Create TestResults directory
-        run: mkdir -p TestResults
-
-      - name: Run Unity Tests (PlayMode)
-        uses: game-ci/unity-test-runner@v3
-        with:
-          unityVersion: 2023.1.18f1
+          version: 2023.1.18f1
           testMode: playmode
           projectPath: .
-          artifactsPath: TestResults
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: PlayModeResults
-          path: TestResults/PlayModeResults.xml
-          
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: PlayMode Tests
