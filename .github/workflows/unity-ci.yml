@@ -15,9 +15,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Decode and write Unity license file
+      - name: Write Unity license file from secret
         run: |
-          echo "${{ secrets.UNITY_LICENSE_BASE64 }}" | base64 -d > unity.ulf
+          echo "${{ secrets.UNITY_LICENSE }}" > unity.ulf
 
       - name: Run Unity PlayMode tests in Docker
         run: |
