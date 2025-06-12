@@ -2,15 +2,18 @@ using UnityEngine;
 
 /// <summary>
 /// Represents a cleanable stain in the scene.
-/// Includes spray logic, cleaning logic, and fade-out animation.
+/// Includes spray logic, cleaning logic, and unique ID for save/load tracking.
 /// </summary>
 public class CleaningTarget : MonoBehaviour {
     [Header("Cleaning Settings")]
     [SerializeField] private ToolType requiredTool;
     [SerializeField] private int cleanHitsRequired = 15;
     [SerializeField] private SpriteRenderer dirtRenderer;
-    [SerializeField] private ParticleSystem scrubEffect;
     [SerializeField] private int stageNumber = 1;
+    [SerializeField] private ParticleSystem scrubEffect;
+
+    [Header("Save State")]
+    [SerializeField] private string uniqueID;
 
     private float currentCleanProgress = 0f;
     private bool isClean = false;
@@ -18,6 +21,10 @@ public class CleaningTarget : MonoBehaviour {
 
     private void Start() {
         StageManager.Instance?.RegisterCleaningTarget(this);
+
+        if (string.IsNullOrEmpty(uniqueID)) {
+            Debug.LogError($"[CleaningTarget] Missing uniqueID on '{name}'. Please assign one in the Inspector.");
+        }
 
         if (dirtRenderer == null)
             dirtRenderer = GetComponent<SpriteRenderer>();
@@ -64,8 +71,9 @@ public class CleaningTarget : MonoBehaviour {
     public float GetProgress() => Mathf.Clamp01(currentCleanProgress / cleanHitsRequired);
     public void MarkSprayed() => sprayed = true;
     public bool WasSprayed() => sprayed;
-    public ToolType GetRequiredTool() => requiredTool;
     public int GetStageNumber() => stageNumber;
+    public ToolType GetRequiredTool() => requiredTool;
+    public string GetID() => uniqueID;
 
     public void StopScrubEffect() {
         if (scrubEffect != null && scrubEffect.isPlaying)
@@ -75,9 +83,16 @@ public class CleaningTarget : MonoBehaviour {
     public void CompleteCleaning() {
         isClean = true;
 
+        if (!string.IsNullOrEmpty(uniqueID)) {
+            SaveManager.Instance?.ForceAddCleanedID(uniqueID); // ensure ID is added before destroy
+        }
+
         StopScrubEffect();
         CleaningProgressUI.Instance?.HideProgressBar();
         StageManager.Instance?.OnTargetCleaned(this);
         Destroy(gameObject);
     }
 }
+
+
+

@@ -9,7 +9,7 @@ on:
 
 jobs:
   playmode-tests:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout project
@@ -25,10 +25,11 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 6000.0.41f1
+          unityVersion: 2023.1.18f1
           testMode: playmode
           artifactsPath: TestResults
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: -disable-rendering
 
       - name: Upload test results
         if: always()

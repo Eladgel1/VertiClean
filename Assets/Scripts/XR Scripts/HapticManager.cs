@@ -1,3 +1,95 @@
+/*using UnityEngine;
+using UnityEngine.XR;
+using System.Collections;
+using System.Collections.Generic;
+
+public class HapticManager : MonoBehaviour {
+    public static HapticManager Instance { get; private set; }
+
+    private InputDevice leftController;
+    private InputDevice rightController;
+
+    private bool leftHapticActive = false;
+    private bool rightHapticActive = false;
+    private float leftAmplitude = 0f;
+    private float rightAmplitude = 0f;
+
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    private void Start() {
+        InitializeControllers();
+    }
+
+    private void Update() {
+        if (leftHapticActive && leftController.isValid)
+            leftController.SendHapticImpulse(0u, leftAmplitude, Time.deltaTime);
+
+        if (rightHapticActive && rightController.isValid)
+            rightController.SendHapticImpulse(0u, rightAmplitude, Time.deltaTime);
+    }
+
+    private void InitializeControllers() {
+        var leftDevices = new List<InputDevice>();
+        var rightDevices = new List<InputDevice>();
+
+        InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, leftDevices);
+        InputDevices.GetDevicesAtXRNode(XRNode.RightHand, rightDevices);
+
+        if (leftDevices.Count > 0) {
+            leftController = leftDevices[0];
+            Debug.Log("[HapticManager] Left controller initialized");
+        }
+        else {
+            Debug.LogWarning("[HapticManager] Left controller NOT found");
+        }
+
+        if (rightDevices.Count > 0) {
+            rightController = rightDevices[0];
+            Debug.Log("[HapticManager] Right controller initialized");
+        }
+        else {
+            Debug.LogWarning("[HapticManager] Right controller NOT found");
+        }
+    }
+
+
+    public void StartHaptic(XRNode hand, float intensity) {
+        intensity = Mathf.Clamp01(intensity);
+
+        if (hand == XRNode.LeftHand && leftController.isValid) {
+            leftHapticActive = true;
+            leftAmplitude = intensity;
+        }
+        else if (hand == XRNode.RightHand && rightController.isValid) {
+            rightHapticActive = true;
+            rightAmplitude = intensity;
+        }
+    }
+
+    public void StopHaptic(XRNode hand) {
+        if (hand == XRNode.LeftHand) {
+            leftHapticActive = false;
+            if (leftController.isValid) leftController.StopHaptics();
+        }
+        else if (hand == XRNode.RightHand) {
+            rightHapticActive = false;
+            if (rightController.isValid) rightController.StopHaptics();
+        }
+    }
+
+    public void StopAllHaptics() {
+        StopHaptic(XRNode.LeftHand);
+        StopHaptic(XRNode.RightHand);
+    }
+}*/
+
+
 using UnityEngine;
 using UnityEngine.XR;
 using System.Collections;

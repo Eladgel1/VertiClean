@@ -1,3 +1,231 @@
+/*using UnityEngine;
+
+[RequireComponent(typeof(CharacterController))]
+public class Player : MonoBehaviour {
+    public static Player Instance { get; private set; }
+
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float sprintMultiplier = 2f;
+    [SerializeField] private float jumpHeight = 2f;
+    [SerializeField] private float gravity = -9.81f;
+
+    [Header("Mouse Look Settings")]
+    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private Transform cameraTransform;
+
+    private CharacterController controller;
+    private Vector3 velocity;
+    private bool isGrounded;
+    private float xRotation = 0f;
+    private bool movementEnabled = true;
+
+    private bool isWalkingNow = false;
+
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Debug.LogWarning("[Player] Duplicate Player instance detected. Destroying this one.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        Debug.Log("[Player] Player.Instance has been set.");
+
+        controller = GetComponent<CharacterController>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void Update() {
+        if (!movementEnabled) return;
+
+        HandleMovement();
+        HandleMouseLook();
+    }
+
+    private void HandleMovement() {
+        isGrounded = controller.isGrounded;
+        if (isGrounded && velocity.y < 0) velocity.y = -2f;
+
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+        Vector3 move = transform.right * x + transform.forward * z;
+
+        float currentSpeed = moveSpeed;
+        if (Input.GetKey(KeyCode.LeftShift)) currentSpeed *= sprintMultiplier;
+
+        controller.Move(move * currentSpeed * Time.deltaTime);
+
+        // Track walking state and play walking sound without interfering other sounds
+        bool moving = (x != 0 || z != 0);
+        if (moving != isWalkingNow) {
+            isWalkingNow = moving;
+            SoundManager.Instance?.SetWalking(isWalkingNow);
+        }
+
+        if (Input.GetButtonDown("Jump") && isGrounded)
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void HandleMouseLook() {
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
+    }
+
+    public void DisableMovement() => movementEnabled = false;
+    public void EnableMovement() => movementEnabled = true;
+
+    public void ApplyGameData() {
+        Debug.Log($"[Player] Applying saved position: {GameData.Position}");
+
+        controller = GetComponent<CharacterController>();
+        if (controller != null) {
+            controller.enabled = false;
+            transform.position = GameData.Position;
+            controller.enabled = true;
+            Debug.Log("[Player] Position applied successfully.");
+        }
+        else {
+            Debug.LogError("[Player] CharacterController not found!");
+        }
+    }
+
+    public void ExportToGameData() {
+        GameData.Position = transform.position;
+        Debug.Log($"[Player] Exported position to GameData: {GameData.Position}");
+    }
+}*/
+
+/*using UnityEngine;
+using UnityEngine.InputSystem;
+
+[RequireComponent(typeof(CharacterController))]
+public class Player : MonoBehaviour {
+    public static Player Instance { get; private set; }
+
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float sprintMultiplier = 2f;
+    [SerializeField] private float jumpHeight = 2f;
+    [SerializeField] private float gravity = -9.81f;
+
+    [Header("Mouse Look Settings")]
+    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private Transform cameraTransform;
+
+    private CharacterController controller;
+    private Vector3 velocity;
+    private bool isGrounded;
+    private float xRotation = 0f;
+    private bool movementEnabled = true;
+
+    private bool isWalkingNow = false;
+
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Debug.LogWarning("[Player] Duplicate Player instance detected. Destroying this one.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        Debug.Log("[Player] Player.Instance has been set.");
+
+        controller = GetComponent<CharacterController>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void Update() {
+        if (!movementEnabled) return;
+
+        HandleMovement();
+        HandleLook();
+    }
+
+    private void HandleMovement() {
+        isGrounded = controller.isGrounded;
+        if (isGrounded && velocity.y < 0) velocity.y = -2f;
+
+        Vector2 input = VRInputManager.Instance.GetMoveVector();
+        Vector3 move = transform.right * input.x + transform.forward * input.y;
+
+        float currentSpeed = moveSpeed;
+        if (Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed)
+            currentSpeed *= sprintMultiplier;
+
+        controller.Move(move * currentSpeed * Time.deltaTime);
+
+        bool moving = (input.x != 0 || input.y != 0);
+        if (moving != isWalkingNow) {
+            isWalkingNow = moving;
+            SoundManager.Instance?.SetWalking(isWalkingNow);
+        }
+
+        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void HandleLook() {
+        Vector2 lookInput = VRInputManager.Instance.GetTurnVector();
+
+        float sensitivity = mouseSensitivity;
+
+        // Detect if input is from mouse (delta is usually much higher than [-1,1])
+        bool isMouse = Mathf.Abs(lookInput.x) > 2f || Mathf.Abs(lookInput.y) > 2f;
+        if (!isMouse) {
+            sensitivity *= 0.3f; // Reduce sensitivity for thumbstick input
+        }
+
+        float mouseX = lookInput.x * sensitivity;
+        float mouseY = lookInput.y * sensitivity;
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
+    }
+
+
+
+    public void DisableMovement() => movementEnabled = false;
+    public void EnableMovement() => movementEnabled = true;
+
+    public void ApplyGameData() {
+        Debug.Log($"[Player] Applying saved position: {GameData.Position}");
+
+        controller = GetComponent<CharacterController>();
+        if (controller != null) {
+            controller.enabled = false;
+            transform.position = GameData.Position;
+            controller.enabled = true;
+            Debug.Log("[Player] Position applied successfully.");
+        }
+        else {
+            Debug.LogError("[Player] CharacterController not found!");
+        }
+    }
+
+    public void ExportToGameData() {
+        GameData.Position = transform.position;
+        Debug.Log($"[Player] Exported position to GameData: {GameData.Position}");
+    }
+}*/
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,6 +252,7 @@ public class Player : MonoBehaviour {
 
     private void Awake() {
         if (Instance != null && Instance != this) {
+            Debug.LogWarning("[Player] Duplicate Player instance detected. Destroying this one.");
             Destroy(gameObject);
             return;
         }
@@ -69,11 +298,13 @@ public class Player : MonoBehaviour {
 
     private void HandleLook() {
         Vector2 lookInput = VRInputManager.Instance.GetTurnVector();
+
         float sensitivity = mouseSensitivity;
 
+        // Scale thumbstick input so it behaves like mouse movement
         bool isThumbstick = Mouse.current == null || Mouse.current.delta.ReadValue().magnitude <= 0.01f;
         if (isThumbstick)
-            lookInput *= 55f;
+            lookInput *= 55f; // Boost low thumbstick values for rotation effect
 
         float mouseX = lookInput.x * sensitivity;
         float mouseY = lookInput.y * sensitivity;
@@ -81,10 +312,33 @@ public class Player : MonoBehaviour {
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
+        // Apply vertical look to camera
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        // Apply horizontal rotation to body
         transform.Rotate(Vector3.up * mouseX);
     }
 
     public void DisableMovement() => movementEnabled = false;
     public void EnableMovement() => movementEnabled = true;
+
+    public void ApplyGameData() {
+        Debug.Log($"[Player] Applying saved position: {GameData.Position}");
+        controller = GetComponent<CharacterController>();
+        if (controller != null) {
+            controller.enabled = false;
+            transform.position = GameData.Position;
+            controller.enabled = true;
+            Debug.Log("[Player] Position applied successfully.");
+        }
+        else {
+            Debug.LogError("[Player] CharacterController not found!");
+        }
+    }
+
+    public void ExportToGameData() {
+        GameData.Position = transform.position;
+        Debug.Log($"[Player] Exported position to GameData: {GameData.Position}");
+    }
 }
+

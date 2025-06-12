@@ -22,11 +22,8 @@ public class IntroManager : MonoBehaviour {
     }
 
     private void Start() {
-        isIntroRunning = true;
-        currentIndex = 0;
-        ShowCurrentMessage();
-        introPanel.SetActive(true);
-        LockPlayer();
+        ShowStageIntro(GameData.Level);
+        Debug.Log($"[IntroManager] Init check — Level: {GameData.Level}, ReplayStage: {GameData.ReplayStage}, Replay: {GameData.StartedFromReplay}, FromSave: {GameData.LoadedFromSave}, ShowIntro: {GameData.ShowIntro}");
     }
 
     private void Update() {
@@ -39,13 +36,31 @@ public class IntroManager : MonoBehaviour {
             }
 
             currentIndex++;
-            if (currentIndex < introMessages.Length) {
+            if (currentIndex < introMessages.Length && GameData.Level == 1 && GameData.ShowIntro) {
                 ShowCurrentMessage();
             }
             else {
                 EndIntro();
             }
         }
+    }
+
+    public void ShowStageIntro(int stageNumber) {
+        if (stageNumber > 1 || !GameData.ShowIntro || GameData.LoadedFromSave || GameData.StartedFromReplay) {
+            introPanel.SetActive(false);
+            introText.text = "";
+            isIntroRunning = false;
+            UnlockPlayer();
+            Debug.Log("[IntroManager] Intro skipped by ShowStageIntro conditions.");
+            return;
+        }
+
+        isIntroRunning = true;
+        currentIndex = stageNumber - 1;
+        ShowCurrentMessage();
+        introPanel.SetActive(true);
+        LockPlayer();
+        Debug.Log("[IntroManager] Showing Stage Intro.");
     }
 
     public void ShowNewStageMessage(string message) {
@@ -72,7 +87,9 @@ public class IntroManager : MonoBehaviour {
         introPanel.SetActive(false);
         introText.text = "";
         isIntroRunning = false;
+        GameData.ShowIntro = false;
         UnlockPlayer();
+        Debug.Log("[IntroManager] Intro ended and ShowIntro set to false.");
     }
 
     private void EndCustomMessage() {
@@ -93,4 +110,3 @@ public class IntroManager : MonoBehaviour {
             Player.Instance.EnableMovement();
     }
 }
-

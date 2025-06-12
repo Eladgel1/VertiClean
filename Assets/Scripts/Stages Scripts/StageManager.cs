@@ -7,8 +7,19 @@ public class StageManager : MonoBehaviour {
 
     [SerializeField] private int currentStage = 1;
 
+    [Header("Skybox Materials")]
+    [SerializeField] private Material initialSkybox;
+    [SerializeField] private Material stage3Skybox;
+    [SerializeField] private Material stage4Skybox;
+
     private List<CleaningTarget> cleaningTargets = new List<CleaningTarget>();
     private int cleanedTargets = 0;
+
+    private Dictionary<int, List<string>> stainsToRemoveByReplayStage = new Dictionary<int, List<string>>() {
+        { 2, new List<string> { "Stain_1", "Stain_2" } },
+        { 3, new List<string> { "Stain_1", "Stain_2", "Stain_3", "Stain_4", "Stain_5" } },
+        { 4, new List<string> { "Stain_1", "Stain_2", "Stain_3", "Stain_4", "Stain_5", "Stain_6", "Stain_7", "Stain_8" } }
+    };
 
     private void Awake() {
         if (Instance != null && Instance != this) Destroy(gameObject);
@@ -44,23 +55,29 @@ public class StageManager : MonoBehaviour {
             RegisterCleaningTarget(target);
         }
 
+        RemoveUnwantedStainsIfReplaying();
         UpdateToolVisibility();
+        UpdateEnvironmentVisuals();
 
-        Debug.Log($"Stage {newStage} initialized with {cleaningTargets.Count} targets.");
+        GameData.Level = currentStage;
 
-        string toolInfo = "";
-
-        if (currentStage == 3) {
-            toolInfo = "The cleaning tool now available to you is a mop instead of a sponge.\n\n";
+        if (currentStage > GameData.MaxStageReached) {
+            GameData.MaxStageReached = currentStage;
         }
 
-        string message =
-            $"Welcome to stage {currentStage},\n" +
-            "Clean all stains using the right tools.\n\n" +
-            toolInfo +
-            "Press Enter to continue.";
+        Debug.Log($"Stage {newStage} initialized with {cleaningTargets.Count} targets.");
+    }
 
-        IntroManager.Instance.ShowNewStageMessage(message);
+    private void RemoveUnwantedStainsIfReplaying() {
+        int replayStage = GameData.ReplayStage;
+        if (replayStage < 1 || !stainsToRemoveByReplayStage.ContainsKey(replayStage)) return;
+
+        List<string> idsToRemove = stainsToRemoveByReplayStage[replayStage];
+        foreach (var target in Object.FindObjectsByType<CleaningTarget>(FindObjectsSortMode.None)) {
+            if (idsToRemove.Contains(target.GetID())) {
+                Destroy(target.gameObject);
+            }
+        }
     }
 
     private void UpdateToolVisibility() {
@@ -75,6 +92,17 @@ public class StageManager : MonoBehaviour {
         }
     }
 
+    private void UpdateEnvironmentVisuals() {
+        if (currentStage == 3) {
+            RenderSettings.skybox = stage3Skybox;
+            RenderSettings.fogColor = new Color32(152, 162, 168, 255);
+        }
+        else if (currentStage == 4) {
+            RenderSettings.skybox = stage4Skybox;
+            RenderSettings.fogColor = new Color32(142, 142, 142, 255);
+        }
+    }
+
     public void ReadyToDescend() {
         StartCoroutine(WaitForGroundLevel());
     }
@@ -86,21 +114,58 @@ public class StageManager : MonoBehaviour {
 
         Player.Instance.DisableMovement();
 
-        currentStage++;
+        // Handle replay resume stage
+        if (GameData.StartedFromReplay && GameData.ResumeStageAfterReplay > 0) {
+            currentStage = GameData.ResumeStageAfterReplay;
+            GameData.Level = currentStage;
+            GameData.MaxStageReached = Mathf.Max(GameData.MaxStageReached, currentStage);
+            GameData.StartedFromReplay = false;
+            GameData.ResumeStageAfterReplay = -1;
+        }
+        else {
+            currentStage++;
+            GameData.Level = currentStage;
+            GameData.MaxStageReached = Mathf.Max(GameData.MaxStageReached, currentStage);
+        }
+
         if (currentStage > 4) {
             ShowEndGameMessage();
             yield break;
         }
 
         SetStage(currentStage);
+
+        string toolInfo = "";
+        string weatherInfo = "";
+
+        if (currentStage == 3) {
+            toolInfo = "The cleaning tool now available to you is a mop instead of a sponge.\n\n";
+            weatherInfo = "Please note: The weather is changing to cloudy, you may feel light winds blowing.\n\n";
+        }
+        else if (currentStage == 4) {
+            weatherInfo = "Please note: During the stage you are going to experience weather accompanied by heavy cloud cover and stronger winds.\n\n";
+        }
+
+        string message =
+            $"Welcome to stage {currentStage},\n" +
+            "Clean all stains using the right tools.\n\n" +
+            toolInfo +
+            weatherInfo +
+            "Press Enter to continue.";
+
+        IntroManager.Instance.ShowNewStageMessage(message);
     }
+
 
     private void ShowEndGameMessage() {
         Player.Instance.DisableMovement();
 
+        RenderSettings.skybox = initialSkybox;
+        RenderSettings.fogColor = new Color32(124, 177, 207, 255);
+
         string finalMessage =
             "Congratulations! You have completed all the stages in VertiClean.\n" +
-            "You faced your fear of heights and mastered every cleaning challenge.\n" +
+            "You faced your fear of heights and overcame challenging weather conditions.\n" +
             "There's no doubt — you're a true cleaning professional.\n" +
             "Thank you for playing.\n\n" +
             "Press Enter to continue.";
@@ -113,6 +178,16 @@ public class StageManager : MonoBehaviour {
     public void RegisterCleaningTarget(CleaningTarget target) {
         if (!cleaningTargets.Contains(target) && target.GetStageNumber() == currentStage) {
             cleaningTargets.Add(target);
+
+            // Detect pre-cleaned stains (restored via GameRestorer)
+            if (SaveManager.Instance != null && SaveManager.Instance.HasCleanedID(target.GetID())) {
+                cleanedTargets++;
+            }
         }
     }
+
+    public bool TryGetCleanedIDsForReplayStage(int stage, out List<string> ids) {
+        return stainsToRemoveByReplayStage.TryGetValue(stage, out ids);
+    }
+
 }

@@ -12,6 +12,7 @@ public class SoundManager : MonoBehaviour {
     [SerializeField] private AudioSource mopSource;
     [SerializeField] private AudioSource spongeSource;
     [SerializeField] private AudioSource spraySource;
+    [SerializeField] private AudioSource windSource;
 
     [Header("Clips")]
     public AudioClip citySound;
@@ -21,6 +22,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClip spraySound;
     public AudioClip walkingSound;
     public AudioClip stageCompleteSound;
+    public AudioClip windSound;
 
     private bool isInGameScene;
 
@@ -35,6 +37,7 @@ public class SoundManager : MonoBehaviour {
     }
 
     private void Start() {
+        // Check if we are in the GameScene
         isInGameScene = SceneManager.GetActiveScene().name == "GameScene";
 
         if (isInGameScene && citySound != null) {
@@ -42,6 +45,40 @@ public class SoundManager : MonoBehaviour {
             musicSource.loop = true;
             musicSource.volume = 0.5f;
             musicSource.Play();
+        }
+    }
+
+    private void Update() {
+        if (!isInGameScene) return;
+
+        UpdateCityVolumeByHeight();
+        UpdateWindSoundByHeight();
+    }
+
+    // Adjust city ambient volume by platform Y position
+    private void UpdateCityVolumeByHeight() {
+        if (CleanerPlatform.Instance == null) return;
+
+        float y = CleanerPlatform.Instance.transform.position.y;
+        float t = Mathf.InverseLerp(8.8f, 58f, y);
+        musicSource.volume = Mathf.Lerp(0.5f, 0f, t);
+    }
+
+    // Play/stop wind based on stage and height
+    private void UpdateWindSoundByHeight() {
+        if (CleanerPlatform.Instance == null || windSound == null) return;
+
+        float y = CleanerPlatform.Instance.transform.position.y;
+        int stage = StageManager.Instance?.GetCurrentStage() ?? 0;
+
+        if (stage == 3 && y >= 37.8f) {
+            PlayWind(0.5f);
+        }
+        else if (stage == 4 && y >= 50.7f) {
+            PlayWind(0.8f);
+        }
+        else {
+            StopWind();
         }
     }
 
@@ -72,6 +109,19 @@ public class SoundManager : MonoBehaviour {
         HandleLoop(source, clip, active, isMop ? 0.7f : 1f);
     }
 
+    private void PlayWind(float volume) {
+        if (windSource.isPlaying) return;
+        windSource.clip = windSound;
+        windSource.volume = volume;
+        windSource.loop = true;
+        windSource.Play();
+    }
+
+    private void StopWind() {
+        if (windSource.isPlaying)
+            windSource.Stop();
+    }
+
     private void HandleLoop(AudioSource source, AudioClip clip, bool play, float volume) {
         if (source == null || clip == null) return;
 
@@ -88,3 +138,5 @@ public class SoundManager : MonoBehaviour {
         }
     }
 }
+
+
