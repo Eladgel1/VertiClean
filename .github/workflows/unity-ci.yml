@@ -1,4 +1,4 @@
-name: Unity PlayMode Tests
+name: Unity PlayMode Tests (Docker)
 
 on:
   push:
@@ -8,30 +8,29 @@ on:
   pull_request:
 
 jobs:
-  test:
+  playmode-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Unity Editor
-        uses: unity-actions/setup@v2
-        with:
-          unity-version: 2023.1.18f1
-
-      - name: Run PlayMode tests
+      - name: Run Unity PlayMode tests in Docker
         run: |
-          /opt/unity-editor/Unity \
-            -batchmode \
-            -nographics \
-            -projectPath . \
-            -runTests \
-            -testPlatform PlayMode \
-            -testResults TestResults/PlayModeResults.xml \
-            -logFile -
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -w /project \
+            unityci/editor:ubuntu-2023.1.18f1-linux-il2cpp-0 \
+            unity-editor \
+              -batchmode \
+              -nographics \
+              -projectPath /project \
+              -runTests \
+              -testPlatform PlayMode \
+              -testResults /project/TestResults/results.xml \
+              -logFile -
 
-      - name: Upload Test Results
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
