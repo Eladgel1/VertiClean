@@ -20,24 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Unity
-        uses: game-ci/unity-installer@v2
+      - name: Run PlayMode Tests
+        uses: game-ci/unity-actions@v2
         with:
           version: 2023.1.18f1
-
-      - name: Activate Unity license
-        uses: game-ci/unity-activate@v2
-        with:
+          testMode: PlayMode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           username: ${{ secrets.UNITY_EMAIL }}
           password: ${{ secrets.UNITY_PASSWORD }}
-
-      - name: Run All PlayMode Tests
-        uses: game-ci/unity-test-runner@v2
-        with:
-          testMode: PlayMode
-          unityVersion: 2023.1.18f1
-          projectPath: .
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Test Results
         if: always()
