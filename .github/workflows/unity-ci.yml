@@ -21,18 +21,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Unity
-        uses: game-ci/unity-installer@v1
+        uses: webbertakken/unity-installer@v1
         with:
-          version: 2023.1.18f1  # ⚠️ לא ניתן להשתמש עם 6000 כרגע
+          unityVersion: 2023.1.18f1
 
       - name: Activate Unity license
-        uses: game-ci/unity-activate@v1
+        uses: webbertakken/unity-activate@v1
         with:
           username: ${{ secrets.UNITY_EMAIL }}
           password: ${{ secrets.UNITY_PASSWORD }}
 
-      - name: Run All PlayMode Tests
-        uses: game-ci/unity-test-runner@v1
+      - name: Run PlayMode Tests
+        uses: webbertakken/unity-test-runner@v2
         with:
           testMode: PlayMode
           unityVersion: 2023.1.18f1
