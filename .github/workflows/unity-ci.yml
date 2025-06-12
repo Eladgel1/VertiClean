@@ -29,7 +29,6 @@ jobs:
           testMode: playmode
           artifactsPath: TestResults
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
 
       - name: Upload test results
         if: always()
