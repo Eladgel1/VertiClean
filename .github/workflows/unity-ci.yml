@@ -17,7 +17,7 @@ jobs:
 
       - name: Write Unity license file from secret
         run: |
-          echo "${{ secrets.UNITY_LICENSE }}" > unity.ulf
+          echo "${{ secrets.UNITY_LICENSE }}" | awk 'BEGIN { print "" } { print }' > unity.ulf
 
       - name: Run Unity PlayMode tests in Docker
         run: |
