@@ -14,6 +14,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Cache Unity License
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/unity3d
+          key: ${{ runner.os }}-unity-license-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-unity-license-
 
       - name: Debug - Verify license file exists
         run: |
