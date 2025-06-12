@@ -20,7 +20,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
-            unityci/editor:ubuntu-2023.1.18f1-base-0 \
+            unityci/editor:ubuntu-2023.1.18f1-linux-il2cpp-3.1.0 \
             unity-editor \
               -batchmode \
               -nographics \
