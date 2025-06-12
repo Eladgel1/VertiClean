@@ -15,8 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Debug - Verify license file exists
+        run: |
+          echo "Checking license file:"
+          ls -la Assets/License/
+          cat Assets/License/Unity_lic.ulf || echo "License file not found!"
+
       - name: Run Unity PlayMode tests in Docker
         run: |
+          mkdir -p TestResults
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
