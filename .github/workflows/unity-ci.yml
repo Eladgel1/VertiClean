@@ -1,4 +1,4 @@
-name: Run PlayMode Tests (Unity)
+name: Unity PlayMode Tests
 
 on:
   push:
@@ -8,33 +8,30 @@ on:
   pull_request:
 
 jobs:
-  playmode-tests:
-    name: PlayMode Tests on Windows
-    runs-on: windows-latest
-
-    env:
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  test:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Unity
-        uses: game-ci/unity-installer@v3
+      - name: Setup Unity Editor
+        uses: unity-actions/setup@v2
         with:
-          version: 6000.0.41f1
+          unity-version: 2023.1.18f1
 
-      - name: Run PlayMode Tests
-        uses: game-ci/unity-test-runner@v3
-        with:
-          testMode: PlayMode
-          unityVersion: 6000.0.41f1
-          projectPath: .
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run PlayMode tests
+        run: |
+          /opt/unity-editor/Unity \
+            -batchmode \
+            -nographics \
+            -projectPath . \
+            -runTests \
+            -testPlatform PlayMode \
+            -testResults TestResults/PlayModeResults.xml \
+            -logFile -
 
-      - name: Upload test results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
