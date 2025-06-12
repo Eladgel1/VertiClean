@@ -21,18 +21,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Unity
-        uses: game-ci/unity-installer@v3
+        uses: game-ci/unity-installer@v2
         with:
           version: 2023.1.18f1
 
       - name: Activate Unity license
-        uses: game-ci/unity-activate@v3
+        uses: game-ci/unity-activate@v2
         with:
           username: ${{ secrets.UNITY_EMAIL }}
           password: ${{ secrets.UNITY_PASSWORD }}
 
       - name: Run All PlayMode Tests
-        uses: game-ci/unity-test-runner@v3
+        uses: game-ci/unity-test-runner@v2
         with:
           testMode: PlayMode
           unityVersion: 2023.1.18f1
