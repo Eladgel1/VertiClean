@@ -23,7 +23,7 @@ jobs:
       - name: Set up Unity
         uses: game-ci/unity-installer@v3
         with:
-          version: 6000.0.41f1
+          version: 2023.1.18f1
 
       - name: Activate Unity license
         uses: game-ci/unity-activate@v3
@@ -35,7 +35,7 @@ jobs:
         uses: game-ci/unity-test-runner@v3
         with:
           testMode: PlayMode
-          unityVersion: 6000.0.41f1
+          unityVersion: 2023.1.18f1
           projectPath: .
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
