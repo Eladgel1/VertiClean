@@ -1,47 +1,49 @@
-name: Unity PlayMode Tests
+name: Unity Sprint Pipeline
 
 on:
   push:
     branches:
-      - main
-      - sprint-*
+      - 'sprint-*'
   pull_request:
+    branches:
+      - 'sprint-*'
 
 jobs:
-  playmode-tests:
-    name: Run All Tests (Unit + Integration)
-    runs-on: windows-latest
-
-    env:
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+  test:
+    name: Run Unity PlayMode Tests (Docker)
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Unity
-        uses: webbertakken/unity-installer@v1
+      - name: Cache Unity
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/unity3d
+            ~/.local/share/unity3d
+          key: ${{ runner.os }}-unity-cache
+          restore-keys: |
+            ${{ runner.os }}-unity-cache
+
+      - name: Create TestResults directory
+        run: mkdir -p TestResults
+
+      - name: Run Unity Tests (PlayMode)
+        uses: game-ci/unity-test-runner@v3
         with:
           unityVersion: 2023.1.18f1
-
-      - name: Activate Unity license
-        uses: webbertakken/unity-activate@v1
-        with:
-          username: ${{ secrets.UNITY_EMAIL }}
-          password: ${{ secrets.UNITY_PASSWORD }}
-
-      - name: Run PlayMode Tests
-        uses: webbertakken/unity-test-runner@v2
-        with:
-          testMode: PlayMode
-          unityVersion: 2023.1.18f1
+          testMode: playmode
           projectPath: .
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          artifactsPath: TestResults
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
       - name: Upload Test Results
-        if: always()
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: PlayModeTestResults
-          path: TestResults
+          name: PlayModeResults
+          path: TestResults/PlayModeResults.xml
+          
