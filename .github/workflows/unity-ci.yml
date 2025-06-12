@@ -14,38 +14,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Cache Unity License
-        uses: actions/cache@v4
+
+      - name: Run Unity PlayMode Tests
+        uses: game-ci/unity-test-runner@v3
         with:
-          path: |
-            ~/.local/share/unity3d
-          key: ${{ runner.os }}-unity-license-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-unity-license-
-
-      - name: Debug - Verify license file exists
-        run: |
-          echo "Checking license file:"
-          ls -la Assets/License/
-          cat Assets/License/Unity_lic.ulf || echo "License file not found!"
-
-      - name: Run Unity PlayMode tests in Docker
-        run: |
-          mkdir -p TestResults
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -w /project \
-            -v ${{ github.workspace }}/Assets/License/Unity_lic.ulf:/root/.local/share/unity3d/Unity/Unity_lic.ulf \
-            unityci/editor:ubuntu-2023.1.18f1-linux-il2cpp-3.1.0 \
-            unity-editor \
-              -batchmode \
-              -nographics \
-              -projectPath /project \
-              -runTests \
-              -testPlatform PlayMode \
-              -testResults /project/TestResults/results.xml \
-              -logFile -
+          unityVersion: 2023.1.18f1
+          testMode: playmode
+          projectPath: .
+          artifactsPath: TestResults
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
 
       - name: Upload test results
         if: always()
