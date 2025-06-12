@@ -9,25 +9,50 @@ public class CleaningProgressUI : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI feedbackText;
 
     private void Awake() {
-        if (Instance != null && Instance != this) Destroy(gameObject);
-        else Instance = this;
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+        }
+        else {
+            Instance = this;
+        }
 
-        HideProgressBar();
-        HideFeedback();
+        if (progressBar != null) {
+            HideProgressBar();
+        }
+        else {
+            Debug.LogWarning("CleaningProgressUI: progressBar is null in Awake()");
+        }
+
+        if (feedbackText != null) {
+            HideFeedback();
+        }
+        else {
+            Debug.LogWarning("CleaningProgressUI: feedbackText is null in Awake()");
+        }
     }
 
     public void ShowProgress(float progress) {
-        if (progressBar == null) return; 
+        if (progressBar == null) {
+            Debug.LogWarning("CleaningProgressUI: ShowProgress called but progressBar is null");
+            return;
+        }
 
         progressBar.gameObject.SetActive(true);
         progressBar.value = Mathf.Clamp01(progress);
     }
 
     public void HideProgressBar() {
-        progressBar.gameObject.SetActive(false);
+        if (progressBar != null) {
+            progressBar.gameObject.SetActive(false);
+        }
     }
 
     public void ShowFeedback(string message, Color color) {
+        if (feedbackText == null) {
+            Debug.LogWarning("CleaningProgressUI: ShowFeedback called but feedbackText is null");
+            return;
+        }
+
         feedbackText.text = message;
         feedbackText.color = color;
         feedbackText.gameObject.SetActive(true);
@@ -36,6 +61,9 @@ public class CleaningProgressUI : MonoBehaviour {
     }
 
     private void HideFeedback() {
-        feedbackText.gameObject.SetActive(false);
+        if (feedbackText != null) {
+            feedbackText.gameObject.SetActive(false);
+        }
     }
 }
+

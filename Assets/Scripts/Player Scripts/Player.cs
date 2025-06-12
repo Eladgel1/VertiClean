@@ -20,6 +20,7 @@ public class Player : MonoBehaviour {
     private bool isGrounded;
     private float xRotation = 0f;
     private bool movementEnabled = true;
+    private bool isWalkingNow = false;
 
     private void Awake() {
         if (Instance != null && Instance != this) {
@@ -52,6 +53,12 @@ public class Player : MonoBehaviour {
             currentSpeed *= sprintMultiplier;
 
         controller.Move(move * currentSpeed * Time.deltaTime);
+
+        bool moving = (input.x != 0 || input.y != 0);
+        if (moving != isWalkingNow) {
+            isWalkingNow = moving;
+            SoundManager.Instance?.SetWalking(isWalkingNow);
+        }
 
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);

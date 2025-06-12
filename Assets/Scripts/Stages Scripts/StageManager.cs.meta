@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 0de7078a91e61c545932ceaaa67e2eee
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - stage3Skybox: {instanceID: 0}
+  - stage4Skybox: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

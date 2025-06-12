@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Represents a cleanable stain in the scene.
-/// Includes spray logic, cleaning logic, and unique ID for save/load tracking.
+/// Includes spray logic, cleaning logic, and fade-out animation.
 /// </summary>
 public class CleaningTarget : MonoBehaviour {
     [Header("Cleaning Settings")]
@@ -10,12 +10,15 @@ public class CleaningTarget : MonoBehaviour {
     [SerializeField] private int cleanHitsRequired = 15;
     [SerializeField] private SpriteRenderer dirtRenderer;
     [SerializeField] private ParticleSystem scrubEffect;
+    [SerializeField] private int stageNumber = 1;
 
     private float currentCleanProgress = 0f;
     private bool isClean = false;
     private bool sprayed = false;
 
     private void Start() {
+        StageManager.Instance?.RegisterCleaningTarget(this);
+
         if (dirtRenderer == null)
             dirtRenderer = GetComponent<SpriteRenderer>();
 
@@ -26,7 +29,13 @@ public class CleaningTarget : MonoBehaviour {
     public void TryClean(ToolType toolUsed, float progressTime) {
         if (isClean || !sprayed || toolUsed != requiredTool) return;
 
-        float secondsToClean = 10f;
+        float secondsToClean = 15f;
+
+        if (toolUsed == ToolType.Sponge) {
+            int stage = StageManager.Instance != null ? StageManager.Instance.GetCurrentStage() : 1;
+            secondsToClean = (stage == 1 || stage == 2) ? 10f : 15f;
+        }
+
         float scrubSpeed = cleanHitsRequired / secondsToClean;
         currentCleanProgress += progressTime * scrubSpeed;
 
@@ -56,6 +65,7 @@ public class CleaningTarget : MonoBehaviour {
     public void MarkSprayed() => sprayed = true;
     public bool WasSprayed() => sprayed;
     public ToolType GetRequiredTool() => requiredTool;
+    public int GetStageNumber() => stageNumber;
 
     public void StopScrubEffect() {
         if (scrubEffect != null && scrubEffect.isPlaying)
@@ -67,6 +77,7 @@ public class CleaningTarget : MonoBehaviour {
 
         StopScrubEffect();
         CleaningProgressUI.Instance?.HideProgressBar();
+        StageManager.Instance?.OnTargetCleaned(this);
         Destroy(gameObject);
     }
 }

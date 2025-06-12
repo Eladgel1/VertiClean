@@ -27,6 +27,9 @@ public class SpongeTool : CleaningToolBase {
                     if (!target.WasSprayed()) {
                         if (CleaningProgressUI.Instance != null)
                             CleaningProgressUI.Instance.ShowFeedback("Spray first!", Color.red);
+                        target.StopScrubEffect();
+                        SoundManager.Instance?.SetSponging(false, IsMop());
+                        StopHaptics();
                         return;
                     }
 
@@ -37,14 +40,21 @@ public class SpongeTool : CleaningToolBase {
                     target.TryClean(GetToolData().toolType, Time.deltaTime);
                     float postProgress = target.GetProgress();
 
-                    float fill = Mathf.Clamp01(postProgress);
-                    if (CleaningProgressUI.Instance != null)
-                        CleaningProgressUI.Instance.ShowProgress(fill);
+                    SoundManager.Instance?.SetSponging(true, IsMop());
+
+                    // Trigger continuous haptic while cleaning is active
+                    float vibrationStrength = IsMop() ? 0.9f : 0.55f;
+                    var left = HapticManager.Instance.GetLeftController();
+                    var right = HapticManager.Instance.GetRightController();
+
+                    if (left.isValid)
+                        left.SendHapticImpulse(0u, vibrationStrength, Time.deltaTime);
+                    if (right.isValid)
+                        right.SendHapticImpulse(0u, vibrationStrength, Time.deltaTime);
 
                     if (preProgress < 0.99f && postProgress >= 0.99f) {
+                        ShowRandomPraise();
                         currentTarget = null;
-                        if (CleaningProgressUI.Instance != null)
-                            CleaningProgressUI.Instance.HideProgressBar();
                     }
 
                     return;
@@ -52,16 +62,37 @@ public class SpongeTool : CleaningToolBase {
             }
         }
 
+        // Stop everything if not scrubbing a valid target
         if (currentTarget != null)
             currentTarget.StopScrubEffect();
 
         currentTarget = null;
+
         if (CleaningProgressUI.Instance != null)
             CleaningProgressUI.Instance.HideProgressBar();
+
+        SoundManager.Instance?.SetSponging(false, IsMop());
+        StopHaptics();
+    }
+
+    private void StopHaptics() {
+        HapticManager.Instance.StopHaptic(XRNode.RightHand);
+        HapticManager.Instance.StopHaptic(XRNode.LeftHand);
+    }
+
+    private bool IsMop() {
+        var data = GetToolData();
+        return data.toolType.ToString().ToLower().Contains("mop");
+    }
+
+    private void ShowRandomPraise() {
+        string[] messages = { "Great!", "Awesome!", "Amazing!", "Fantastic!", "Incredible!" };
+        int index = Random.Range(0, messages.Length);
+        if (CleaningProgressUI.Instance != null)
+            CleaningProgressUI.Instance.ShowFeedback(messages[index], Color.cyan);
     }
 
     public override void UseTool(RaycastHit hit) {
-        // Not used directly
+        // Not used directly — logic handled in Update
     }
 }
-

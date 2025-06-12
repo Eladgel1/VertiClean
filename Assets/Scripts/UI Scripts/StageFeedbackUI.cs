@@ -1,13 +1,14 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class StageFeedbackUI : MonoBehaviour {
     public static StageFeedbackUI Instance { get; private set; }
 
     [Header("UI References")]
     [SerializeField] private GameObject canvasObject;
-    [SerializeField] private GameObject panel;
+    [SerializeField] private GameObject panel; // only the container of buttons
     [SerializeField] private TextMeshProUGUI messageText;
 
     [Header("Rating Buttons")]
@@ -49,13 +50,14 @@ public class StageFeedbackUI : MonoBehaviour {
             "You may descend to the ground to proceed.\n\n" +
             "Please rate the overall experience of the current stage:";
 
-        Player.Instance?.DisableMovement();
+        SoundManager.Instance?.PlayStageComplete();
+
+        Player.Instance.DisableMovement();
 
         selectedIndex = 0;
         awaitingRating = true;
         SelectButton(selectedIndex);
     }
-
     private void Update() {
         if (awaitingRating) {
             Vector2 nav = VRInputManager.Instance.GetUINavigationDelta();
@@ -78,7 +80,8 @@ public class StageFeedbackUI : MonoBehaviour {
             if (canvasObject != null)
                 canvasObject.SetActive(false);
 
-            Player.Instance?.EnableMovement();
+            Player.Instance.EnableMovement();
+            StageManager.Instance.ReadyToDescend();
         }
     }
 
@@ -95,10 +98,12 @@ public class StageFeedbackUI : MonoBehaviour {
 
         awaitingRating = false;
 
+        // Disable entire panel containing the buttons
         if (panel != null)
             panel.SetActive(false);
 
-        Invoke(nameof(EnableContinue), 0.3f);
+        Invoke(nameof(EnableContinue), 0.3f); // prevent double-enter
+
     }
 
     private void EnableContinue() {
