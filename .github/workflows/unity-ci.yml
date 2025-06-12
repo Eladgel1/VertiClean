@@ -1,4 +1,4 @@
-name: Build and Test Unity Project
+name: Unity PlayMode Tests (Docker)
 
 on:
   push:
@@ -8,12 +8,14 @@ on:
   pull_request:
 
 jobs:
-  build:
+  playmode-tests:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Run Unity Tests
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Unity PlayMode tests
         uses: game-ci/unity-test-runner@v3
         with:
           unityVersion: 2023.1.18f1
@@ -24,9 +26,9 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
 
-      - name: Upload test results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TestResults
+          name: PlayModeResults
           path: TestResults
