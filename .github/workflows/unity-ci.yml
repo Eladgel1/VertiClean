@@ -17,6 +17,11 @@ jobs:
         with:
           lfs: true
 
+      - name: Debug — List Test Files
+        run: |
+          echo "🔍 Searching for test files in the Assets folder..."
+          find ./Assets -name '*.cs' | grep -i test || echo "⚠️ No test scripts found"
+
       - name: Run PlayMode tests (Unity Test Runner)
         uses: game-ci/unity-test-runner@v4
         id: tests
