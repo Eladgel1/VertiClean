@@ -49,6 +49,9 @@ public class StageManager : MonoBehaviour {
         cleanedTargets = 0;
         cleaningTargets.Clear();
 
+        // START TRACKING SESSION TIME
+        StatisticsManager.Instance.BeginSession(currentStage);
+
         CleanerPlatform.Instance.UpdateMaxHeight();
 
         foreach (var target in Object.FindObjectsByType<CleaningTarget>(FindObjectsSortMode.None)) {

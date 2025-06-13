@@ -59,7 +59,6 @@ public class ToolInteractionManager : MonoBehaviour {
             else {
                 ShowTemporaryMessage("Move closer to pick up a tool.", 2f);
             }
-
         }
 
         if (VRInputManager.Instance.GetDropPressed() && currentTool != null) {
@@ -88,7 +87,7 @@ public class ToolInteractionManager : MonoBehaviour {
     private void ShowTemporaryMessage(string message, float duration) {
         isTempMessageActive = true;
         uiPrompt.ShowMessage(message);
-        CancelInvoke(nameof(ClearTemporaryMessage)); // prevent stacking
+        CancelInvoke(nameof(ClearTemporaryMessage));
         Invoke(nameof(ClearTemporaryMessage), duration);
     }
 
@@ -99,3 +98,4 @@ public class ToolInteractionManager : MonoBehaviour {
 
     public bool HasActiveTool() => currentTool != null;
 }
+

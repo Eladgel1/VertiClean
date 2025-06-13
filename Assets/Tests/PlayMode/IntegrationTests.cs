@@ -19,6 +19,9 @@ public class IntegrationTests {
     private GameObject introObj;
     private GameObject playerObj;
     private GameObject introCanvasGO;
+    private GameObject statsGO;
+    private GameObject saveGO;
+
 
     private SpongeTool sponge;
     private SprayTool spray;
@@ -27,9 +30,13 @@ public class IntegrationTests {
 
     [SetUp]
     public void SetUp() {
+        platformObj = new GameObject("Platform");
+        platform = platformObj.AddComponent<CleanerPlatform>();
+        typeof(CleanerPlatform).SetField("Instance", platform);
+
         mockInputObj = new GameObject("MockVRInput");
         var input = mockInputObj.AddComponent<VRInputManager>();
-        typeof(VRInputManager).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, input);
+        typeof(VRInputManager).SetField("Instance", input);
         typeof(VRInputManager).GetField("scrubVector", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(input, new Vector2(1f, 1f));
         typeof(VRInputManager).GetField("scrubButtonHeld", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(input, true);
 
@@ -65,18 +72,14 @@ public class IntegrationTests {
         PrivateSet(spray, "toolData", CreateToolSO(ToolType.Spray));
         typeof(CleaningToolBase).GetField("isHeld", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(spray, true);
 
-        platformObj = new GameObject("Platform");
-        platform = platformObj.AddComponent<CleanerPlatform>();
-        typeof(CleanerPlatform).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, platform);
-
         hapticObj = new GameObject("HapticManager");
         hapticObj.AddComponent<HapticManager>();
-        typeof(HapticManager).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, hapticObj.GetComponent<HapticManager>());
+        typeof(HapticManager).SetField("Instance", hapticObj.GetComponent<HapticManager>());
 
         soundObj = new GameObject("SoundManager");
         soundObj.AddComponent<AudioSource>();
         soundObj.AddComponent<SoundManager>();
-        typeof(SoundManager).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, soundObj.GetComponent<SoundManager>());
+        typeof(SoundManager).SetField("Instance", soundObj.GetComponent<SoundManager>());
 
         cleaningUIObj = new GameObject("CleaningUI");
         var textGO = new GameObject("FeedbackText");
@@ -90,16 +93,16 @@ public class IntegrationTests {
         var ui = cleaningUIObj.AddComponent<CleaningProgressUI>();
         PrivateSet(ui, "feedbackText", tmp);
         PrivateSet(ui, "progressBar", slider);
-        typeof(CleaningProgressUI).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, ui);
-        ui.GetType().GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(ui, null);
+        typeof(CleaningProgressUI).SetField("Instance", ui);
+        ui.InvokeAwake();
 
         stageUIObj = new GameObject("StageFeedbackUI");
         var sfu = stageUIObj.AddComponent<StageFeedbackUI>();
-        typeof(StageFeedbackUI).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, sfu);
+        typeof(StageFeedbackUI).SetField("Instance", sfu);
 
         introObj = new GameObject("IntroManager");
         var intro = introObj.AddComponent<IntroManager>();
-        typeof(IntroManager).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, intro);
+        typeof(IntroManager).SetField("Instance", intro);
 
         introCanvasGO = new GameObject("IntroCanvas");
         var panelGO = new GameObject("IntroPanel");
@@ -116,7 +119,16 @@ public class IntegrationTests {
         playerObj = new GameObject("Player");
         playerObj.AddComponent<CharacterController>();
         var player = playerObj.AddComponent<Player>();
-        typeof(Player).GetField("Instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, player);
+        typeof(Player).SetField("Instance", player);
+
+        statsGO = new GameObject("StatisticsManager");
+        statsGO.AddComponent<StatisticsManager>();
+        typeof(StatisticsManager).SetField("Instance", statsGO.GetComponent<StatisticsManager>());
+
+        saveGO = new GameObject("SaveManager");
+        saveGO.AddComponent<SaveManager>();
+        typeof(SaveManager).SetField("Instance", saveGO.GetComponent<SaveManager>());
+
     }
 
     [TearDown]
@@ -134,6 +146,9 @@ public class IntegrationTests {
         Object.DestroyImmediate(introObj);
         Object.DestroyImmediate(introCanvasGO);
         Object.DestroyImmediate(playerObj);
+        Object.DestroyImmediate(statsGO);
+        Object.DestroyImmediate(saveGO);
+
 
         typeof(VRInputManager).SetField("Instance", null);
         typeof(SoundManager).SetField("Instance", null);
@@ -142,19 +157,20 @@ public class IntegrationTests {
         typeof(StageFeedbackUI).SetField("Instance", null);
         typeof(IntroManager).SetField("Instance", null);
         typeof(Player).SetField("Instance", null);
+        typeof(CleanerPlatform).SetField("Instance", null);
+        typeof(StatisticsManager).SetField("Instance", null);
+        typeof(SaveManager).SetField("Instance", null);
     }
 
     [Test]
     public void SpongeTool_CleansTarget_WhenSprayedFirst() {
         PrivateSet(target, "sprayed", true);
         Assert.IsTrue(target.WasSprayed());
-
         float time = 0f;
         while (time < 1f) {
-            sponge.GetType().GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance)?.Invoke(sponge, null);
+            sponge.InvokePrivateUpdate();
             time += 0.05f;
         }
-
         Assert.GreaterOrEqual(target.GetProgress(), 0f);
     }
 
@@ -163,7 +179,6 @@ public class IntegrationTests {
         platform.transform.position = new Vector3(0f, 17.3f, 0f);
         platform.InvokePrivateUpdate();
         Assert.LessOrEqual(platform.transform.position.y, 17.3f);
-
         platform.transform.position = new Vector3(0f, 8.8f, 0f);
         platform.InvokePrivateUpdate();
         Assert.GreaterOrEqual(platform.transform.position.y, 8.8f);
@@ -195,10 +210,9 @@ public class IntegrationTests {
     public void StageManager_ChangesStageCorrectly() {
         var smGO = new GameObject("StageManager");
         var sm = smGO.AddComponent<StageManager>();
-        var dummyTarget = new GameObject("DummyTarget").AddComponent<CleaningTarget>();
-        PrivateSet(sm, "allTargets", new System.Collections.Generic.List<CleaningTarget> { dummyTarget });
         sm.SetStage(2);
         Assert.AreEqual(2, sm.GetCurrentStage());
+        Object.DestroyImmediate(smGO);
     }
 
     [Test]
@@ -220,39 +234,43 @@ public class IntegrationTests {
     public void SaveMenuUI_OpensAndDisplaysSlotData() {
         var uiGO = new GameObject("SaveMenuUI");
         var saveUI = uiGO.AddComponent<SaveMenuUI>();
-
         var titleGO = new GameObject("TitleText");
+
         titleGO.transform.SetParent(uiGO.transform);
+
         var titleText = titleGO.AddComponent<TextMeshProUGUI>();
         PrivateSet(saveUI, "titleText", titleText);
 
         var slotGO = new GameObject("Slot0");
         slotGO.transform.SetParent(uiGO.transform);
-        var button = slotGO.AddComponent<Button>();
 
+        var button = slotGO.AddComponent<Button>();
         var labelGO = new GameObject("Label");
+
         labelGO.transform.SetParent(slotGO.transform);
         var label = labelGO.AddComponent<TextMeshProUGUI>();
-        label.text = "Slot 0";
 
+        label.text = "Slot 0";
         var slotArray = new GameObject[] { slotGO };
         var field = typeof(SaveMenuUI).GetField("slotButtons", BindingFlags.NonPublic | BindingFlags.Instance);
         field?.SetValue(saveUI, slotArray);
 
         var namePanel = new GameObject("EnterNamePanel");
         namePanel.transform.SetParent(uiGO.transform);
-        PrivateSet(saveUI, "enterNamePanel", namePanel);
 
+        PrivateSet(saveUI, "enterNamePanel", namePanel);
         var nameInputGO = new GameObject("NameInput");
+
         nameInputGO.transform.SetParent(namePanel.transform);
         var input = nameInputGO.AddComponent<TMP_InputField>();
-        PrivateSet(saveUI, "nameInput", input);
 
+        PrivateSet(saveUI, "nameInput", input);
         var confirmGO = new GameObject("ConfirmButton");
+
         confirmGO.transform.SetParent(namePanel.transform);
         var confirm = confirmGO.AddComponent<Button>();
-        PrivateSet(saveUI, "confirmNameButton", confirm);
 
+        PrivateSet(saveUI, "confirmNameButton", confirm);
         PrivateSet(saveUI, "saveSlots", new System.Collections.Generic.List<Button> { button });
 
         uiGO.SetActive(true);
@@ -266,8 +284,8 @@ public class IntegrationTests {
     public void GameRestorer_RestoresCleanedTargetProperly() {
         var restorerGO = new GameObject("Restorer");
         var restorer = restorerGO.AddComponent<GameRestorer>();
-        typeof(GameRestorer).SetField("Instance", restorer);
 
+        typeof(GameRestorer).SetField("Instance", restorer);
         var dummyData = new FullSaveData {
             cleanedTargetIDs = new System.Collections.Generic.List<string> { "abc123" },
             stageNumber = 2,
@@ -280,37 +298,35 @@ public class IntegrationTests {
 
         GameData.LoadFromFullSave(dummyData);
         restorer.ApplyLoadedData(dummyData);
-
         Assert.AreEqual(2, GameData.Level);
         Assert.AreEqual(new Vector3(1, 1, 1), GameData.Position);
-
         Object.DestroyImmediate(restorerGO);
     }
 
     [Test]
     public void GameManager_ReplaysStageWhenSet() {
         GameData.ReplayStage = 2;
-
         var smGO = new GameObject("StageManager");
         var sm = smGO.AddComponent<StageManager>();
+
         typeof(StageManager).SetField("Instance", sm);
-
         var dummyTarget = new GameObject("DummyTarget").AddComponent<CleaningTarget>();
-        dummyTarget.transform.position = Vector3.zero;
-        PrivateSet(dummyTarget, "uniqueID", "abc");
-        PrivateSet(sm, "allTargets", new System.Collections.Generic.List<CleaningTarget> { dummyTarget });
 
+        dummyTarget.transform.position = Vector3.zero;
+
+        PrivateSet(dummyTarget, "uniqueID", "abc");
         var replayGO = new GameObject("ReplayStageHandler");
         var handler = replayGO.AddComponent<ReplayStageHandler>();
+
         handler.InvokeAwake();
 
         var gmGO = new GameObject("GameManager");
         var gm = gmGO.AddComponent<GameManager>();
+
         gm.InvokeAwake();
         gm.InvokeStart();
 
         Assert.AreEqual(2, GameData.Level);
-
         Object.DestroyImmediate(gmGO);
         Object.DestroyImmediate(smGO);
         Object.DestroyImmediate(replayGO);
@@ -343,7 +359,6 @@ public class IntegrationTests {
         so.toolType = type;
         return so;
     }
-
 }
 
 public static class ReflectionExtensions {
@@ -359,4 +374,5 @@ public static class ReflectionExtensions {
     public static void InvokeStart(this MonoBehaviour mb) =>
         mb.GetType().GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(mb, null);
 }
+
 

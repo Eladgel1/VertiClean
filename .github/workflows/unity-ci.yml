@@ -1,4 +1,4 @@
-name: Unity Tests
+name: Unity PlayMode Tests
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         with:
           lfs: true
 
-      - name: Run PlayMode tests (Unity Test Runner)
+      - name: Run PlayMode tests
         uses: game-ci/unity-test-runner@v4
         id: tests
         env:
@@ -28,6 +28,7 @@ jobs:
         with:
           unityVersion: 2023.1.18f1
           testMode: playmode
+          projectPath: ./
           artifactsPath: TestResults
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           customParameters: -disable-rendering

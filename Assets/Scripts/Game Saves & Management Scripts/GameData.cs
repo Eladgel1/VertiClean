@@ -13,6 +13,8 @@ public static class GameData {
     public static int ResumeStageAfterReplay = -1;
     public static bool ShowIntro = true;
 
+    public static Dictionary<int, StageStats> CachedStatistics = null;
+
     public static void LoadFromFullSave(FullSaveData full) {
         if (full == null || full.playerData == null) return;
 

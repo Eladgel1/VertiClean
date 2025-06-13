@@ -46,6 +46,11 @@ public class UnitTests {
 
     [Test]
     public void CleaningToolBase_ResetsPositionAfterDrop() {
+        var platformGO = new GameObject("Platform");
+        platformGO.AddComponent<CleanerPlatform>();
+        typeof(CleanerPlatform).GetField("Instance", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
+                               ?.SetValue(null, platformGO.GetComponent<CleanerPlatform>());
+
         var toolGO = new GameObject("Tool");
         toolGO.AddComponent<BoxCollider>();
         toolGO.AddComponent<Rigidbody>();
@@ -58,6 +63,9 @@ public class UnitTests {
 
         Assert.AreEqual(mockTool.transform.localPosition, mockTool.GetOriginalLocalPosition());
         Assert.AreEqual(mockTool.transform.localRotation, mockTool.GetOriginalLocalRotation());
+
+        Object.DestroyImmediate(toolGO);
+        Object.DestroyImmediate(platformGO);
     }
 
     [Test]
@@ -120,10 +128,15 @@ public class UnitTests {
 
     [Test]
     public void SaveManager_CreatesAndDeletesSlot() {
-        var go = new GameObject("SaveManager");
-        var sm = go.AddComponent<SaveManager>();
+        var smGO = new GameObject("SaveManager");
+        var sm = smGO.AddComponent<SaveManager>();
         typeof(SaveManager).GetField("Instance", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
                            ?.SetValue(null, sm);
+
+        var statsGO = new GameObject("StatsManager");
+        var stats = statsGO.AddComponent<StatisticsManager>();
+        typeof(StatisticsManager).GetField("Instance", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                                 ?.SetValue(null, stats);
 
         GameData.PlayerName = "Dummy";
         GameData.Position = Vector3.one;
@@ -145,9 +158,57 @@ public class UnitTests {
         sm.DeleteSlot(0);
         Assert.IsFalse(File.Exists(path), "Save file was not deleted");
 
+        Object.DestroyImmediate(smGO);
+        Object.DestroyImmediate(statsGO);
+    }
+
+    [Test]
+    public void StatisticsManager_BeginEndSession_StoresTimeAndRating() {
+        var go = new GameObject("StatisticsManager");
+        var sm = go.AddComponent<StatisticsManager>();
+        typeof(StatisticsManager).GetField("Instance", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                                 ?.SetValue(null, sm);
+
+        sm.BeginSession(1);
+        typeof(StatisticsManager).GetField("currentSessionStartTime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                 ?.SetValue(sm, Time.time - 120f);
+        sm.EndSession("4");
+
+        var stats = sm.GetStatsForStage(1);
+        Assert.IsNotNull(stats);
+        Assert.AreEqual("4", stats.lastRating);
+        Assert.GreaterOrEqual(stats.totalTimeSeconds, 119f);
         Object.DestroyImmediate(go);
     }
 
+    [Test]
+    public void StatisticsManager_ResetStatistics_ClearsAll() {
+        var go = new GameObject("StatisticsManager");
+        var sm = go.AddComponent<StatisticsManager>();
+        typeof(StatisticsManager).GetField("Instance", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                                 ?.SetValue(null, sm);
+
+        sm.BeginSession(2);
+        sm.EndSession("5");
+        sm.ResetStatistics();
+
+        var stats = sm.GetStatsForStage(2);
+        Assert.IsNull(stats);
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void StageStats_UpdateSession_TracksMinMaxCorrectly() {
+        var stats = new StageStats();
+        stats.UpdateSession(120f, "3");
+        stats.UpdateSession(60f, "4");
+        stats.UpdateSession(180f, "5");
+
+        Assert.AreEqual(360f, stats.totalTimeSeconds, 0.1f);
+        Assert.AreEqual(60f, stats.minSessionSeconds, 0.1f);
+        Assert.AreEqual(180f, stats.maxSessionSeconds, 0.1f);
+        Assert.AreEqual("5", stats.lastRating);
+    }
 
     private void SetPrivate<T>(object obj, string fieldName, T value) {
         var field = obj.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -160,3 +221,4 @@ public class UnitTests {
         public Quaternion GetOriginalLocalRotation() => originalRotation;
     }
 }
+

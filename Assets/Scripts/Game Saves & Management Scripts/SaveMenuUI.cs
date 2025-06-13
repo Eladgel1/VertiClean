@@ -166,7 +166,8 @@ public class SaveMenuUI : MonoBehaviour {
             Player.Instance != null &&
             StageManager.Instance != null &&
             SaveManager.Instance != null &&
-            GameRestorer.Instance != null
+            GameRestorer.Instance != null &&
+            StatisticsManager.Instance != null
         );
     }
 

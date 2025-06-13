@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour {
     public GameObject mainMenuPanel;
     public GameObject startSubMenuPanel;
     public GameObject previousStagesPanel;
+    public GameObject statisticsPanel;
     public GameObject optionsMenuPanel;
     public GameObject quitConfirmationPanel;
     public GameObject pauseMenuPanel;
@@ -107,6 +108,18 @@ public class MenuManager : MonoBehaviour {
         }
 
         if (VRInputManager.Instance.GetUIBack() || VRInputManager.Instance.GetOpenMenu()) {
+            if (statisticsPanel != null && statisticsPanel.activeSelf) {
+                statisticsPanel.SetActive(false);
+                pauseMenuPanel.SetActive(true);
+                currentPanel = pauseMenuPanel;
+                selectedIndex = 0;
+
+                if (pauseButtons != null && pauseButtons.Length > 0)
+                    pauseButtons[selectedIndex].Select();
+
+                return;
+            }
+
             if (isInGame) TogglePauseMenu();
             else if (currentPanel == startSubMenuPanel || currentPanel == optionsMenuPanel || currentPanel == previousStagesPanel)
                 OpenMainMenu();
@@ -198,6 +211,7 @@ public class MenuManager : MonoBehaviour {
         if (optionsMenuPanel != null) optionsMenuPanel.SetActive(false);
         if (quitConfirmationPanel != null) quitConfirmationPanel.SetActive(false);
         if (previousStagesPanel != null) previousStagesPanel.SetActive(false);
+        if (statisticsPanel != null) statisticsPanel.SetActive(false);
 
         pauseMenuPanel.SetActive(showPause);
         currentPanel = showPause ? pauseMenuPanel : null;
@@ -249,6 +263,11 @@ public class MenuManager : MonoBehaviour {
             saveMenuUI?.Open(SaveActionType.Delete);
     }
 
+    public void OpenStatisticsPanel() {
+        ShowOnlyPanel(statisticsPanel);
+        StatisticsManager.Instance.DisplayStatisticsInUI();
+    }
+
     public void ShowOnlyPanel(GameObject activePanel) {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (startSubMenuPanel != null) startSubMenuPanel.SetActive(false);
@@ -256,6 +275,7 @@ public class MenuManager : MonoBehaviour {
         if (quitConfirmationPanel != null) quitConfirmationPanel.SetActive(false);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         if (previousStagesPanel != null) previousStagesPanel.SetActive(false);
+        if (statisticsPanel != null) statisticsPanel.SetActive(false);
 
         if (activePanel != null) activePanel.SetActive(true);
         currentPanel = activePanel;
@@ -283,6 +303,12 @@ public class MenuManager : MonoBehaviour {
 
         if (GameData.MaxStageReached >= stageNumber) {
             GameData.ReplayStage = stageNumber;
+
+            if (StatisticsManager.Instance != null) {
+                GameData.CachedStatistics = StatisticsManager.Instance.GetAllStats();
+            }
+
+            StatisticsManager.Instance.BeginSession(stageNumber);
             SceneController.LoadGameScene();
         }
     }
@@ -305,3 +331,5 @@ public class MenuManager : MonoBehaviour {
         }
     }
 }
+
+

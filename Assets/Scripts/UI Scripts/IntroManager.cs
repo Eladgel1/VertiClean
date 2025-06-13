@@ -40,6 +40,7 @@ public class IntroManager : MonoBehaviour {
                 ShowCurrentMessage();
             }
             else {
+                if (GameData.Level == 1) StatisticsManager.Instance.BeginSession(1);
                 EndIntro();
             }
         }
@@ -51,6 +52,8 @@ public class IntroManager : MonoBehaviour {
             introText.text = "";
             isIntroRunning = false;
             UnlockPlayer();
+            if (stageNumber == 1 && GameData.LoadedFromSave)
+                StatisticsManager.Instance.BeginSession(1);
             Debug.Log("[IntroManager] Intro skipped by ShowStageIntro conditions.");
             return;
         }

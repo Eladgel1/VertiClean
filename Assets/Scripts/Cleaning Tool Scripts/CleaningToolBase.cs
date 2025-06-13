@@ -11,6 +11,9 @@ public abstract class CleaningToolBase : MonoBehaviour {
     protected Vector3 originalLocalPosition;
     protected Quaternion originalRotation;
 
+    private Transform platformTransform;
+    private Vector3 localPositionRelativeToPlatform;
+
     /// <summary>
     /// Caches initial position and parent of the tool.
     /// </summary>
@@ -18,6 +21,12 @@ public abstract class CleaningToolBase : MonoBehaviour {
         originalParent = transform.parent;
         originalLocalPosition = transform.localPosition;
         originalRotation = transform.localRotation;
+
+        platformTransform = CleanerPlatform.Instance?.transform;
+        if (platformTransform != null)
+            localPositionRelativeToPlatform = platformTransform.InverseTransformPoint(transform.position);
+        else
+            originalWorldPosition = transform.position;
     }
 
     /// <summary>
@@ -33,6 +42,13 @@ public abstract class CleaningToolBase : MonoBehaviour {
         transform.SetParent(playerHand);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
+
+        if (platformTransform == null)
+            platformTransform = CleanerPlatform.Instance?.transform;
+
+        if (platformTransform != null)
+            localPositionRelativeToPlatform = platformTransform.InverseTransformPoint(transform.position);
+
         originalWorldPosition = transform.position;
     }
 
@@ -52,9 +68,14 @@ public abstract class CleaningToolBase : MonoBehaviour {
     public virtual bool IsHeld() => isHeld;
 
     /// <summary>
-    /// Returns the original world-space position of the tool.
+    /// Returns the adjusted world position where the tool was picked up, relative to the platform.
     /// </summary>
-    public virtual Vector3 GetOriginalWorldPosition() => originalWorldPosition;
+    public virtual Vector3 GetOriginalWorldPosition() {
+        if (platformTransform != null)
+            return platformTransform.TransformPoint(localPositionRelativeToPlatform);
+
+        return originalWorldPosition;
+    }
 
     /// <summary>
     /// Abstract method that all cleaning tools must implement for custom tool usage.

@@ -104,6 +104,9 @@ public class StageFeedbackUI : MonoBehaviour {
 
         Invoke(nameof(EnableContinue), 0.3f); // prevent double-enter
 
+        // END TRACKING SESSION AND SAVE RATING
+        StatisticsManager.Instance.EndSession(score.ToString());
+
     }
 
     private void EnableContinue() {

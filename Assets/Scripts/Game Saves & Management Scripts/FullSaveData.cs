@@ -6,4 +6,6 @@ public class FullSaveData {
     public float cleanerPlatformY = 0f;
     public List<string> cleanedTargetIDs = new List<string>();
     public int stageNumber = 1;
+
+    public List<StageStatsEntry> stageStatistics = new List<StageStatsEntry>();
 }
