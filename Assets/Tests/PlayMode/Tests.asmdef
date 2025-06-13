@@ -1,0 +1,15 @@
+{
+  "name": "VertiClean.PlayModeTests",
+  "references": [
+    "VertiCleanRuntime",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "testAssemblies": true,
+  "noEngineReferences": false
+}
