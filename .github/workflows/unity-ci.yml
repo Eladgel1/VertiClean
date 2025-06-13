@@ -3,8 +3,7 @@ name: Unity PlayMode Tests
 on:
   push:
     branches:
-      - main
-      - sprint-*
+      - sprint-4
   pull_request:
 
 jobs:
@@ -46,4 +45,3 @@ jobs:
         with:
           name: Coverage
           path: ${{ steps.tests.outputs.coveragePath }}
-          
