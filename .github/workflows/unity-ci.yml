@@ -8,6 +8,10 @@ on:
     branches:
       - sprint-4
 
+permissions:
+  contents: read
+  checks: write
+
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
