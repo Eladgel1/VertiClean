@@ -1,4 +1,4 @@
-name: Unity License Activation
+name: Activate Unity License
 
 on:
   workflow_dispatch:
@@ -7,6 +7,8 @@ jobs:
   activate:
     name: Activate Unity License
     runs-on: ubuntu-latest
+    container:
+      image: unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,4 +20,4 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          unityVersion: 2023.1.18f1
+          unityVersion: 6000.0.41f1
