@@ -22,7 +22,7 @@ jobs:
           mkdir -p unity-lic
           echo "${UNITY_LICENSE_FILE}" > unity-lic/Unity_lic.ulf
         env:
-          UNITY_LICENSE_FILE: ${{ secrets.UNITY_LICENSE_FILE }}
+          UNITY_LICENSE_FILE: ${{ secrets.UNITY_LICENSE }}
 
       - name: Build using Docker (Unity 6000.0.41f1)
         run: |
@@ -51,7 +51,7 @@ jobs:
           mkdir -p unity-lic
           echo "${UNITY_LICENSE_FILE}" > unity-lic/Unity_lic.ulf
         env:
-          UNITY_LICENSE_FILE: ${{ secrets.UNITY_LICENSE_FILE }}
+          UNITY_LICENSE_FILE: ${{ secrets.UNITY_LICENSE }}
 
       - name: Run PlayMode tests using Docker (Unity 6000.0.41f1)
         run: |
