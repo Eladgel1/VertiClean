@@ -1,81 +1,75 @@
-name: Unity Build and PlayMode Tests (Docker Custom)
+name: Unity Build and PlayMode Tests 🚀
 
 on:
   push:
     branches:
       - sprint-4
   pull_request:
+    branches:
+      - sprint-4
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
-  build-project:
-    name: Build Project (Compile Check)
+  testRunner:
+    name: Run PlayMode Tests 🎯
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout project
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          lfs: true
 
-      - name: Write Unity license file
+      - name: Git LFS Pull
         run: |
-          mkdir -p unity-lic
-          echo "${UNITY_LICENSE}" > unity-lic/Unity_lic.ulf
+          git lfs install
+          git lfs pull
+
+      - name: Run PlayMode tests (Unity 6000.0.41f1)
+        uses: game-ci/unity-test-runner@v4
+        id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Build using Unity (Docker)
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/unity-lic:/root/.local/share/unity3d/Unity \
-            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
-            /opt/unity/Editor/Unity \
-              -batchmode -nographics -logFile -quit \
-              -projectPath /project \
-              -buildTarget StandaloneLinux64
-
-  playmode-tests:
-    name: Run Unity PlayMode Tests (Docker)
-    needs: build-project
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout project
-        uses: actions/checkout@v4
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          lfs: true
+          unityVersion: 6000.0.41f1
+          testMode: playmode
+          projectPath: .
+          customParameters: -disable-rendering -logFile /dev/stdout
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Write Unity license file
-        run: |
-          mkdir -p unity-lic
-          echo "${UNITY_LICENSE}" > unity-lic/Unity_lic.ulf
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Run PlayMode tests using Docker
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/unity-lic:/root/.local/share/unity3d/Unity \
-            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
-            /opt/unity/Editor/Unity \
-              -batchmode -nographics -logFile /project/Tests.log -quit \
-              -projectPath /project \
-              -runTests -testPlatform PlayMode \
-              -artifactsPath /project/TestResults \
-              -disable-rendering
-
-      - name: Upload test log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: UnityPlaymodeLog
-          path: Tests.log
-
-      - name: Upload test results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PlayModeTestResults
-          path: TestResults
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
+
+  buildWindows:
+    needs: testRunner
+    name: Build for Windows 🖥️
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Git LFS Pull
+        run: |
+          git lfs install
+          git lfs pull
+
+      - name: Build for Windows (Unity 6000.0.41f1)
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 6000.0.41f1
+          targetPlatform: StandaloneWindows64
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-StandaloneWindows64
+          path: build/StandaloneWindows64
