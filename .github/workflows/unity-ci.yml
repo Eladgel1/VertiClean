@@ -19,30 +19,27 @@ jobs:
         with:
           lfs: true
 
-      - name: Run PlayMode tests
-        uses: game-ci/unity-test-runner@v4
-        id: tests
+      - name: Run PlayMode Tests via Unity CLI
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          projectPath: ./
-          testMode: playmode
-          artifactsPath: TestResults
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -disable-rendering -logFile /dev/stdout
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' \
+          unity-editor \
+            -projectPath . \
+            -runTests \
+            -testPlatform PlayMode \
+            -logFile /dev/stdout \
+            -disable-rendering \
+            -batchmode \
+            -nographics \
+            -quit \
+            -testResults TestResults/results.xml
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PlayModeTestResults
-          path: ${{ steps.tests.outputs.artifactsPath }}
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Coverage
-          path: ${{ steps.tests.outputs.coveragePath }}
+          path: TestResults/results.xml
