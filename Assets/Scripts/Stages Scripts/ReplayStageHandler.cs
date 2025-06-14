@@ -51,7 +51,7 @@ public class ReplayStageHandler : MonoBehaviour {
                 "Clean all stains using the right tools.\n\n" +
                 toolInfo +
                 weatherInfo +
-                "Press Enter to continue.";
+                "Press the Right Trigger Button to continue.";
 
             IntroManager.Instance?.ShowNewStageMessage(message);
         }

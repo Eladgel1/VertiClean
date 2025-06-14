@@ -94,7 +94,7 @@ public class StageFeedbackUI : MonoBehaviour {
         Debug.Log("User rated stage: " + score);
 
         messageText.text =
-            "Thank you for your feedback!\nYou may proceed to the next stage.\n\nPress Enter to continue.";
+            "Thank you for your feedback!\nYou may proceed to the next stage.\n\nPress the Right Trigger Button to continue.";
 
         awaitingRating = false;
 

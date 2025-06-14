@@ -34,7 +34,7 @@ public class ToolInteractionManager : MonoBehaviour {
                 var tool = hit.GetComponent<CleaningToolBase>();
                 if (tool != null && !tool.IsHeld()) {
                     nearbyTool = tool;
-                    uiPrompt.ShowMessage($"Press [E] button to pick up a {tool.GetToolData().toolName}");
+                    uiPrompt.ShowMessage($"Press [A] button to pick up a {tool.GetToolData().toolName}");
                     return;
                 }
             }
@@ -43,7 +43,7 @@ public class ToolInteractionManager : MonoBehaviour {
         if (currentTool != null) {
             float distanceToReturn = Vector3.Distance(playerHand.position, currentTool.GetOriginalWorldPosition());
             if (distanceToReturn < placementDistance) {
-                uiPrompt.ShowMessage($"Press [F] button to drop the {currentTool.GetToolData().toolName}");
+                uiPrompt.ShowMessage($"Press [B] button to drop the {currentTool.GetToolData().toolName}");
                 return;
             }
         }

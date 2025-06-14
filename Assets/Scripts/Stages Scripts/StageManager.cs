@@ -154,7 +154,7 @@ public class StageManager : MonoBehaviour {
             "Clean all stains using the right tools.\n\n" +
             toolInfo +
             weatherInfo +
-            "Press Enter to continue.";
+            "Press the Right Trigger Button to continue.";
 
         IntroManager.Instance.ShowNewStageMessage(message);
     }
@@ -171,7 +171,7 @@ public class StageManager : MonoBehaviour {
             "You faced your fear of heights and overcame challenging weather conditions.\n" +
             "There's no doubt — you're a true cleaning professional.\n" +
             "Thank you for playing.\n\n" +
-            "Press Enter to continue.";
+            "Press the Right Trigger Button to continue.";
 
         IntroManager.Instance.ShowNewStageMessage(finalMessage, () => {
             Player.Instance.EnableMovement();
