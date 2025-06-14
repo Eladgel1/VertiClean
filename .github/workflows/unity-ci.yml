@@ -50,9 +50,9 @@ jobs:
           name: PlayModeTestResults
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-  buildWindows:
+  buildWebGL:
     needs: testRunner
-    name: Build for Windows 🖥️
+    name: Build for WebGL 🌐
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -63,7 +63,7 @@ jobs:
           git lfs install
           git lfs pull
 
-      - name: Build for Windows (Unity 6000.0.41f1)
+      - name: Build for WebGL (Unity 6000.0.41f1)
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -71,11 +71,11 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: 6000.0.41f1
-          targetPlatform: StandaloneWindows64
+          targetPlatform: WebGL
 
-      - name: Upload Windows Build
+      - name: Upload WebGL Build
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-StandaloneWindows64
-          path: build/StandaloneWindows64
+          name: build-WebGL
+          path: build/WebGL
