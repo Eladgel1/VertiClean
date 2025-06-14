@@ -73,7 +73,9 @@ jobs:
           unityVersion: 6000.0.41f1
           targetPlatform: StandaloneWindows64
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload Windows Build
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: build-StandaloneWindows64
           path: build/StandaloneWindows64
