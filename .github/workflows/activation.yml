@@ -7,15 +7,19 @@ jobs:
   activate:
     name: Activate Unity License
     runs-on: ubuntu-latest
-    container:
-      image: unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Activate Unity License
-        uses: game-ci/unity-activate@v2
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      - name: Run Unity activation in Docker
+        run: |
+          docker run --rm \
+            -e UNITY_EMAIL="${{ secrets.UNITY_EMAIL }}" \
+            -e UNITY_PASSWORD="${{ secrets.UNITY_PASSWORD }}" \
+            -e UNITY_LICENSE="${{ secrets.UNITY_LICENSE }}" \
+            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
+            /opt/unity/Editor/Unity \
+              -batchmode -nographics -logFile -quit \
+              -username "${UNITY_EMAIL}" \
+              -password "${UNITY_PASSWORD}"
