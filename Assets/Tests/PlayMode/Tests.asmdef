@@ -2,14 +2,21 @@
   "name": "VertiClean.PlayModeTests",
   "references": [
     "VertiCleanRuntime",
-    "Unity.TextMeshPro"
+    "Unity.TextMeshPro",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
   "autoReferenced": false,
   "testAssemblies": true,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
   "noEngineReferences": false
 }
