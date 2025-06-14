@@ -10,6 +10,8 @@ jobs:
   build-project:
     name: Build Project (Compile Check)
     runs-on: ubuntu-latest
+    container:
+      image: unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0
 
     steps:
       - name: Checkout project
@@ -17,28 +19,26 @@ jobs:
         with:
           lfs: true
 
-      - name: Write Unity license file
-        run: |
-          mkdir -p unity-lic
-          echo "${UNITY_LICENSE}" > unity-lic/Unity_lic.ulf
+      - name: Activate Unity License
+        uses: game-ci/unity-activate@v2
         env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Build using Docker (Unity 6000.0.41f1)
+      - name: Build using Unity (Docker)
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/unity-lic:/root/.local/share/unity3d/Unity \
-            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
-            /opt/unity/Editor/Unity \
-              -batchmode -nographics -logFile -quit \
-              -projectPath /project \
-              -buildTarget StandaloneLinux64
+          /opt/unity/Editor/Unity \
+            -batchmode -nographics -logFile -quit \
+            -projectPath . \
+            -buildTarget StandaloneLinux64
 
   playmode-tests:
     name: Run Unity PlayMode Tests (Docker)
     needs: build-project
     runs-on: ubuntu-latest
+    container:
+      image: unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0
 
     steps:
       - name: Checkout project
@@ -46,25 +46,21 @@ jobs:
         with:
           lfs: true
 
-      - name: Write Unity license file
-        run: |
-          mkdir -p unity-lic
-          echo "${UNITY_LICENSE}" > unity-lic/Unity_lic.ulf
+      - name: Activate Unity License
+        uses: game-ci/unity-activate@v2
         env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Run PlayMode tests using Docker (Unity 6000.0.41f1)
+      - name: Run PlayMode tests
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/unity-lic:/root/.local/share/unity3d/Unity \
-            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
-            /opt/unity/Editor/Unity \
-              -batchmode -nographics -logFile /project/Tests.log -quit \
-              -projectPath /project \
-              -runTests -testPlatform PlayMode \
-              -artifactsPath /project/TestResults \
-              -disable-rendering
+          /opt/unity/Editor/Unity \
+            -batchmode -nographics -logFile /project/Tests.log -quit \
+            -projectPath . \
+            -runTests -testPlatform PlayMode \
+            -artifactsPath /project/TestResults \
+            -disable-rendering
 
       - name: Upload test log
         if: always()
