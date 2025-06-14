@@ -1,4 +1,4 @@
-name: Unity PlayMode Tests
+name: Unity Build and PlayMode Tests (Docker Custom)
 
 on:
   push:
@@ -10,58 +10,62 @@ jobs:
   build-project:
     name: Build Project (Compile Check)
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Build project to check for compile errors
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: 2023.1.18f1
-          targetPlatform: StandaloneLinux64
-          projectPath: ./
+      - name: Build using Docker (Unity 6000.0.41f1)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -e UNITY_LICENSE="${{ secrets.UNITY_LICENSE }}" \
+            -e UNITY_EMAIL="${{ secrets.UNITY_EMAIL }}" \
+            -e UNITY_PASSWORD="${{ secrets.UNITY_PASSWORD }}" \
+            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
+            /opt/unity/Editor/Unity \
+              -batchmode -nographics -logFile -quit \
+              -projectPath /project \
+              -buildTarget StandaloneLinux64
 
   playmode-tests:
-    name: Run Unity PlayMode Tests
+    name: Run Unity PlayMode Tests (Docker)
     needs: build-project
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Run PlayMode tests
-        uses: game-ci/unity-test-runner@v4
-        id: tests
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      - name: Run PlayMode tests using Docker (Unity 6000.0.41f1)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -e UNITY_LICENSE="${{ secrets.UNITY_LICENSE }}" \
+            -e UNITY_EMAIL="${{ secrets.UNITY_EMAIL }}" \
+            -e UNITY_PASSWORD="${{ secrets.UNITY_PASSWORD }}" \
+            unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0 \
+            /opt/unity/Editor/Unity \
+              -batchmode -nographics -logFile /project/Tests.log -quit \
+              -projectPath /project \
+              -runTests -testPlatform PlayMode \
+              -artifactsPath /project/TestResults \
+              -disable-rendering
+
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          unityVersion: 2023.1.18f1
-          testMode: playmode
-          projectPath: ./
-          artifactsPath: TestResults
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -disable-rendering -logFile /dev/stdout
+          name: UnityPlaymodeLog
+          path: Tests.log
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PlayModeTestResults
-          path: ${{ steps.tests.outputs.artifactsPath }}
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Coverage
-          path: ${{ steps.tests.outputs.coveragePath }}
+          path: TestResults
