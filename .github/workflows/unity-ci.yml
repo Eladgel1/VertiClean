@@ -63,14 +63,14 @@ jobs:
           git lfs install
           git lfs pull
 
-      - name: Build for Windows (Unity 6000.0.41f1)
+      - name: Build for Windows (Unity 2023.2.20f1)
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 6000.0.41f1
+          unityVersion: 2023.2.20f1
           targetPlatform: StandaloneWindows64
 
       - name: Upload Windows Build
