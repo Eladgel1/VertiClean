@@ -10,6 +10,8 @@ jobs:
   playmode-tests:
     name: Run Unity PlayMode Tests
     runs-on: ubuntu-latest
+    container:
+      image: unityci/editor:ubuntu-6000.0.41f1-linux-il2cpp-3.1.0
 
     steps:
       - name: Checkout project
@@ -25,12 +27,11 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 2023.1.18f1
-          testMode: playmode
           projectPath: ./
+          testMode: playmode
           artifactsPath: TestResults
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -disable-rendering
+          customParameters: -disable-rendering -logFile /dev/stdout
 
       - name: Upload test results
         if: always()
