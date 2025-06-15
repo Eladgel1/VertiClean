@@ -50,9 +50,9 @@ jobs:
           name: PlayModeTestResults
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-  buildWebGL:
+  buildLinux:
     needs: testRunner
-    name: Build for WebGL 🌐
+    name: Build for Linux 🐧
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -78,12 +78,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: Library
-          key: Library-build-WebGL
+          key: Library-build-StandaloneLinux64
           restore-keys: |
             Library-build-
             Library-
 
-      - name: Build for WebGL (Unity 6000.0.41f1)
+      - name: Build for Linux (Unity 6000.0.41f1)
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -91,11 +91,12 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: 6000.0.41f1
-          targetPlatform: WebGL
+          targetPlatform: StandaloneLinux64
 
-      - name: Upload WebGL Build
+      - name: Upload Linux Build
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-WebGL
-          path: build/WebGL
+          name: build-StandaloneLinux64
+          path: build/StandaloneLinux64
+
