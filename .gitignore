@@ -10,6 +10,7 @@ MemoryCaptures/
 
 # IDE Files
 .vscode/
+.vs/
 .idea/
 
 # Build + Meta Files
