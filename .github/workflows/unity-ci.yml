@@ -92,6 +92,7 @@ jobs:
         with:
           unityVersion: 6000.0.41f1
           targetPlatform: StandaloneWindows64
+          projectPath: .
 
       - name: Upload Windows Build
         if: always()
