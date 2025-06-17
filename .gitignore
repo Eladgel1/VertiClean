@@ -7,6 +7,9 @@ Builds/
 Logs/
 UserSettings/
 MemoryCaptures/
+Assets/XRControls.cs
+Assets/XRControls.cs.meta
+
 
 # IDE Files
 .vscode/
