@@ -1,0 +1,19 @@
+
+{
+  "name": "VertiCleanRuntime",
+  "autoReferenced": true,
+  "testAssemblies": false,
+  "references": [
+  "Unity.InputSystem",
+  "Unity.TextMeshPro",
+  "Unity.XR.Interaction.Toolkit"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
