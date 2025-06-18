@@ -83,6 +83,9 @@ jobs:
             Library-build-
             Library-
 
+      - name: Cleanup Temp files
+        run: run -rf Temp obj
+
       - name: Build for Windows (Unity 6000.0.41f1)
         uses: game-ci/unity-builder@v4
         env:
