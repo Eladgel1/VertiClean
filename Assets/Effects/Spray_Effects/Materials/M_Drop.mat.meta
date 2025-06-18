@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 37328cb3803a2bb43bae0fa75c1ac54a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 274583
+  packageName: Spray Effects
+  packageVersion: 2.0
+  assetPath: Assets/Spray_Effects/Materials/M_Drop.mat
+  uploadId: 661323
