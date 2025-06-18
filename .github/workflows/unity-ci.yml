@@ -1,47 +1,102 @@
-name: Unity Tests
+name: Unity Build and PlayMode Tests 🚀
 
 on:
   push:
     branches:
-      - main
-      - sprint-*
+      - sprint-3
   pull_request:
+    branches:
+      - sprint-3
+
+permissions:
+  contents: read
+  checks: write
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
-  playmode-tests:
-    name: Run Unity PlayMode Tests
+  testRunner:
+    name: Run PlayMode Tests 🎯
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout project
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          lfs: true
 
-      - name: Run PlayMode tests (Unity Test Runner)
+      - name: Git LFS Pull
+        run: |
+          git lfs install
+          git lfs pull
+
+      - name: Run PlayMode tests (Unity 6000.0.41f1)
         uses: game-ci/unity-test-runner@v4
-        id: tests
+        id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 2023.1.18f1
+          unityVersion: 6000.0.41f1
           testMode: playmode
-          artifactsPath: TestResults
+          projectPath: .
+          customParameters: -disable-rendering -logFile /dev/stdout
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: -disable-rendering
 
-      - name: Upload test results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PlayModeTestResults
-          path: ${{ steps.tests.outputs.artifactsPath }}
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-      - name: Upload coverage report
+  buildWindows:
+    needs: testRunner
+    name: Build for Windows 🖥️
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v4
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
+
+      - name: Restore Library cache
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-build-StandaloneWindows64
+          restore-keys: |
+            Library-build-
+            Library-
+
+      - name: Build for Windows (Unity 6000.0.41f1)
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 6000.0.41f1
+          targetPlatform: StandaloneWindows64
+          projectPath: .
+
+      - name: Upload Windows Build
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Coverage
-          path: ${{ steps.tests.outputs.coveragePath }}
+          name: build-StandaloneWindows64
+          path: build/StandaloneWindows64
