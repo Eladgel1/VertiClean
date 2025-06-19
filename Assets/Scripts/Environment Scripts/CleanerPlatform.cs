@@ -53,7 +53,7 @@ public class CleanerPlatform : MonoBehaviour {
             case 1: return 17.3f;
             case 2: return 27.15f;
             case 3: return 37.8f;
-            case 4: return 50.7f;
+            case 4: return 50.5f;
             default: return 100f;
         }
     }

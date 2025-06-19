@@ -74,7 +74,7 @@ public class SoundManager : MonoBehaviour {
         if (stage == 3 && y >= 37.8f) {
             PlayWind(0.5f);
         }
-        else if (stage == 4 && y >= 50.7f) {
+        else if (stage == 4 && y >= 50.5f) {
             PlayWind(0.8f);
         }
         else {
