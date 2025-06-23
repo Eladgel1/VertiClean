@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public enum SaveActionType { Save, Load, Delete }
 
@@ -21,14 +22,33 @@ public class SaveMenuUI : MonoBehaviour {
     private bool cameFromGame = false;
     private bool inputRecentlyUsed = false;
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+    private TouchScreenKeyboard keyboard;
+#endif
+
     private void Awake() {
         enterNamePanel?.SetActive(false);
     }
 
+    private void Update() {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (keyboard != null && keyboard.status == TouchScreenKeyboard.Status.Done) {
+            if (!string.IsNullOrEmpty(keyboard.text)) {
+                nameInput.text = keyboard.text;
+            }
+            keyboard = null;
+        }
+#endif
+    }
+
     public void Open(SaveActionType action) {
         currentAction = action;
-        inputRecentlyUsed = true;
-        Invoke(nameof(EnableInput), 0.25f);
+
+        // Check last input device: only block if it was keyboard
+        if (Keyboard.current != null && Keyboard.current.anyKey.isPressed) {
+            inputRecentlyUsed = true;
+            Invoke(nameof(EnableInput), 0.25f);
+        }
 
         cameFromGame = SceneManager.GetActiveScene().name == "GameScene";
 
@@ -55,20 +75,19 @@ public class SaveMenuUI : MonoBehaviour {
             int slotIndex = i;
             btn.onClick.RemoveAllListeners();
 
-            if (SaveManager.Instance != null && SaveManager.Instance.SlotExists(slotIndex)) {
+            bool exists = SaveManager.Instance != null && SaveManager.Instance.SlotExists(slotIndex);
+
+            if (exists) {
                 SaveData header = SaveManager.Instance.LoadSlotHeader(slotIndex);
                 label.text = header != null
                     ? $"{header.playerName} - {header.saveTime}"
                     : $"Slot {slotIndex} (Corrupted)";
-
-                if (currentAction != SaveActionType.Save)
-                    btn.onClick.AddListener(() => OnSlotClicked(slotIndex));
             }
             else {
                 label.text = $"Empty Slot No. {slotIndex + 1}";
-                if (currentAction == SaveActionType.Save)
-                    btn.onClick.AddListener(() => OnSlotClicked(slotIndex));
             }
+
+            btn.onClick.AddListener(() => OnSlotClicked(slotIndex));
         }
 
         selectedSlotIndex = 0;
@@ -111,6 +130,10 @@ public class SaveMenuUI : MonoBehaviour {
 
             nameInput.ActivateInputField();
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+            keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, false, false, false, false, "Enter your name");
+#endif
+
             if (confirmNameButton != null) {
                 confirmNameButton.onClick.RemoveAllListeners();
                 confirmNameButton.onClick.AddListener(ConfirmPlayerName);
@@ -121,15 +144,15 @@ public class SaveMenuUI : MonoBehaviour {
         }
         else if (currentAction == SaveActionType.Load) {
             if (SaveManager.Instance != null && SaveManager.Instance.SlotExists(index)) {
-                LoadBuffer.pendingSlotIndex = index; // defer the load until GameScene is ready
+                LoadBuffer.pendingSlotIndex = index;
                 GameData.LoadedFromSave = true;
-                SceneController.LoadGameScene();      // actual loading happens in GameManager
+                SceneController.LoadGameScene();
             }
         }
         else if (currentAction == SaveActionType.Delete) {
             if (SaveManager.Instance != null && SaveManager.Instance.SlotExists(index)) {
                 SaveManager.Instance.DeleteSlot(index);
-                Open(currentAction); // Refresh UI
+                Open(currentAction);
             }
         }
     }
@@ -194,5 +217,4 @@ public class SaveMenuUI : MonoBehaviour {
         }
     }
 }
-
 
