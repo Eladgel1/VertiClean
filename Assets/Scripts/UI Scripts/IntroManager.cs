@@ -18,7 +18,7 @@ public class IntroManager : MonoBehaviour {
         if (Instance != null && Instance != this) Destroy(gameObject);
         else Instance = this;
 
-        XRSettings.eyeTextureResolutionScale = 1.5f;
+        XRSettings.eyeTextureResolutionScale = 1.25f;
     }
 
     private void Start() {

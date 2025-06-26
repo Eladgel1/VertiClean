@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(CharacterController))]
 public class Player : MonoBehaviour {
@@ -22,6 +24,8 @@ public class Player : MonoBehaviour {
     private bool movementEnabled = true;
     private bool isWalkingNow = false;
 
+    private PlayerTunnelingVignetteProvider vignetteProvider;
+
     private void Awake() {
         if (Instance != null && Instance != this) {
             Debug.LogWarning("[Player] Duplicate Player instance detected. Destroying this one.");
@@ -35,11 +39,24 @@ public class Player : MonoBehaviour {
         Cursor.visible = false;
     }
 
+    private void Start() {
+        vignetteProvider = FindFirstObjectByType<PlayerTunnelingVignetteProvider>();
+
+        if (XRSettings.isDeviceActive) {
+            XRSettings.eyeTextureResolutionScale = 1.25f;
+        }
+
+    }
+
     private void Update() {
         if (!movementEnabled) return;
 
         HandleMovement();
         HandleLook();
+
+        if (ShouldStopVignette()) {
+            vignetteProvider?.StopVignette();
+        }
     }
 
     private void HandleMovement() {
@@ -66,6 +83,10 @@ public class Player : MonoBehaviour {
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // Trigger vignette only if using VR
+        if (IsVRActive())
+            vignetteProvider?.StartVignette();
     }
 
     private void HandleLook() {
@@ -76,7 +97,7 @@ public class Player : MonoBehaviour {
         // Scale thumbstick input so it behaves like mouse movement
         bool isThumbstick = Mouse.current == null || Mouse.current.delta.ReadValue().magnitude <= 0.01f;
         if (isThumbstick)
-            lookInput *= 55f; // Boost low thumbstick values for rotation effect
+            lookInput *= 55f;
 
         float mouseX = lookInput.x * sensitivity;
         float mouseY = lookInput.y * sensitivity;
@@ -84,11 +105,28 @@ public class Player : MonoBehaviour {
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        // Apply vertical look to camera
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-
-        // Apply horizontal rotation to body
         transform.Rotate(Vector3.up * mouseX);
+
+        // Trigger vignette only if using VR
+        if (IsVRActive())
+            vignetteProvider?.StartVignette();
+    }
+
+    private bool ShouldStopVignette() {
+        Vector2 move = VRInputManager.Instance.GetMoveVector();
+        Vector2 turn = VRInputManager.Instance.GetTurnVector();
+        return move == Vector2.zero && Mathf.Abs(turn.x) < 0.01f;
+    }
+
+    private bool IsVRActive() {
+        List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+        SubsystemManager.GetSubsystems(subsystems);
+        foreach (var subsystem in subsystems) {
+            if (subsystem.running)
+                return true;
+        }
+        return false;
     }
 
     public void DisableMovement() => movementEnabled = false;
@@ -113,4 +151,6 @@ public class Player : MonoBehaviour {
         Debug.Log($"[Player] Exported position to GameData: {GameData.Position}");
     }
 }
+
+
 

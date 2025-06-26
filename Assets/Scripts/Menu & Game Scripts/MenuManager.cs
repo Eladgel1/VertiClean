@@ -186,8 +186,19 @@ public class MenuManager : MonoBehaviour {
     public void OpenQuitConfirmation() {
         ShowOnlyPanel(quitConfirmationPanel);
         selectedIndex = 0;
-        allowQuitInput = false;
-        Invoke(nameof(EnableQuitInput), 0.3f);
+
+        // If the last input came from keyboard, delay UI interaction for a moment
+        if (Keyboard.current != null && Keyboard.current.anyKey.isPressed) {
+            allowQuitInput = false;
+            Invoke(nameof(EnableQuitInput), 0.25f);
+        }
+        else {
+            allowQuitInput = true;
+        }
+
+        // Select default button (Yes)
+        if (quitYesButton != null)
+            EventSystem.current?.SetSelectedGameObject(quitYesButton.gameObject);
     }
 
     private void EnableQuitInput() {
