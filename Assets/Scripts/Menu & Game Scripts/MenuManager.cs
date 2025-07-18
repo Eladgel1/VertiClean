@@ -190,7 +190,7 @@ public class MenuManager : MonoBehaviour {
         // If the last input came from keyboard, delay UI interaction for a moment
         if (Keyboard.current != null && Keyboard.current.anyKey.isPressed) {
             allowQuitInput = false;
-            Invoke(nameof(EnableQuitInput), 0.25f);
+            Invoke(nameof(EnableQuitInput), 0.3f);
         }
         else {
             allowQuitInput = true;

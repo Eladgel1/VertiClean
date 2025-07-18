@@ -44,12 +44,6 @@ public class SaveMenuUI : MonoBehaviour {
     public void Open(SaveActionType action) {
         currentAction = action;
 
-        // Check last input device: only block if it was keyboard
-        if (Keyboard.current != null && Keyboard.current.anyKey.isPressed) {
-            inputRecentlyUsed = true;
-            Invoke(nameof(EnableInput), 0.25f);
-        }
-
         cameFromGame = SceneManager.GetActiveScene().name == "GameScene";
 
         titleText.text = action switch {
