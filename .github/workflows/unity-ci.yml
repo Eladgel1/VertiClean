@@ -3,10 +3,12 @@ name: Unity Build and PlayMode Tests 🚀
 on:
   push:
     branches:
-      - sprint-4
+      - main
+      - sprint-*
   pull_request:
     branches:
-      - sprint-4
+      - main
+      - sprint-*
 
 permissions:
   contents: read
