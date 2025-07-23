@@ -4,8 +4,8 @@ public class ToolInteractionManager : MonoBehaviour {
     public static ToolInteractionManager Instance { get; private set; }
 
     [SerializeField] private Transform playerHand;
-    [SerializeField] private float pickupDistance = 2f;
-    [SerializeField] private float placementDistance = 2.5f;
+    [SerializeField] private float pickupDistance = 2.2f;
+    [SerializeField] private float placementDistance = 2.7f;
     [SerializeField] private LayerMask toolLayer;
     [SerializeField] private UIInteractionPrompt uiPrompt;
 

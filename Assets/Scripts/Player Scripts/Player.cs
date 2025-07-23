@@ -8,13 +8,13 @@ public class Player : MonoBehaviour {
     public static Player Instance { get; private set; }
 
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 2.25f;
+    [SerializeField] private float moveSpeed = 3.25f;
     [SerializeField] private float sprintMultiplier = 2f;
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float gravity = -9.81f;
 
     [Header("Look Settings")]
-    [SerializeField] private float mouseSensitivity = 0.12f;
+    [SerializeField] private float mouseSensitivity = 0.08f;
     [SerializeField] private Transform cameraTransform;
 
     private CharacterController controller;
