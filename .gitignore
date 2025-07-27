@@ -16,7 +16,7 @@ Assets/XRControls.cs.meta
 .idea/
 
 # Temp Files
-.utmp
+.utmp/
 
 # Build + Meta Files
 *.csproj
