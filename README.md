@@ -1,6 +1,6 @@
 🧼 **VertiClean – Therapeutic VR Cleaning Simulator**
 
-A fully immersive Unity VR game designed to treat fear of heights through gradual exposure , built with modular sprints, tested thoroughly, and backed by automated CI/CD.
+A fully immersive Unity VR game designed to treat fear of heights through gradual exposure , built with modular sprints, tested thoroughly, and backed by automated CI.
 
 ---
 
@@ -137,7 +137,7 @@ All tests run automatically in CI and manually via Unity Test Runner.
   - sprint-2: stage manager & haptic manager
   - sprint-3: save system & replay stages system
   - sprint-4: statistics manager 
-- CI/CD pipelines test and build every sprint
+- CI pipeline test and build every sprint
 - Modular codebase that enables isolated testing and improvements
 
 ---
@@ -234,5 +234,3 @@ VertiClean isn’t just a game - it’s a therapeutic tool for treating fear thr
 📣 Final Words:
 
 VertiClean is a full-stack, fully-automated, therapeutically-driven Unity VR project - and now, it’s yours to explore, test, improve, and use.
-
-🔥 Ready to clean your fear of heights away?
